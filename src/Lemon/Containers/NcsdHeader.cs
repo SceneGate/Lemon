@@ -25,18 +25,37 @@ namespace Lemon.Containers
 
     public class NcsdHeader
     {
-        public static string MagicId { get { return "NCSD"; } }
+        public static string MagicId {
+            get { return "NCSD"; }
+        }
 
-        public static int Unit { get { return 0x200; } }
+        public static int Unit {
+            get { return 0x200; }
+        }
 
-        public byte[] Signature { get; set; }
+        public byte[] Signature {
+            get;
+            set;
+        }
 
-        public long Size { get; set; }
+        public long Size {
+            get;
+            set;
+        }
 
-        public ulong MediaId { get; set; }
+        public ulong MediaId {
+            get;
+            set;
+        }
 
-        public NcsdFileSystemType[] FileSystemType { get; set; }
+        public NcsdFileSystemType[] FileSystemType {
+            get;
+            set;
+        }
 
-        public byte[] CryptType { get; set; }
+        public byte[] CryptType {
+            get;
+            set;
+        }
     }
 }

@@ -30,7 +30,9 @@ namespace Lemon.Containers
             Header = new NcsdHeader();
         }
 
-        public static int NumPartitions { get { return 8; } }
+        public static int NumPartitions {
+            get { return 8; }
+        }
 
         public NcsdHeader Header {
             get;

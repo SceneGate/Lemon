@@ -19,7 +19,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.Containers
 {
-    public enum NcsdFileSystemType : byte
+    public enum NcsdFileSystemType
     {
         None = 0,
         Normal = 1,

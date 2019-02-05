@@ -32,9 +32,13 @@ namespace Lemon.Containers
         uint fileInfoOffset;
         uint fileDataOffset;
 
-        public static string MagicId { get { return "IVFC"; } }
+        public static string MagicId {
+            get { return "IVFC"; }
+        }
 
-        public static uint Version { get { return 0x0001_0000; } }
+        public static uint Version {
+            get { return 0x0001_0000; }
+        }
 
         public NodeContainerFormat Convert(BinaryFormat source)
         {
@@ -53,11 +57,11 @@ namespace Lemon.Containers
             reader.Stream.Position = 0x1000; // TODO: Calculate
 
             // Level 3
-            // skip to directory metadata info
+            // TODO: skipped to directory metadata info
             reader.Stream.Position += 0x0C;
             dirInfoOffset = reader.ReadUInt32() + 0x1000;
 
-            // skip to file metadata info
+            // TODO: skipped to file metadata info
             reader.Stream.Position += 0x0C;
             fileInfoOffset = reader.ReadUInt32() + 0x1000;
             reader.ReadUInt32(); // size
@@ -114,7 +118,7 @@ namespace Lemon.Containers
 
             int nameLength = reader.ReadInt32();
             string name = Encoding.Unicode.GetString(reader.ReadBytes(nameLength));
-            
+
             var binary = new BinaryFormat(reader.Stream, fileDataOffset + offset, size);
             current.Add(new Node(name, binary));
 

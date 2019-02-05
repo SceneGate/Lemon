@@ -40,20 +40,21 @@ namespace Lemon.Containers
             if (reader.ReadString(4) != NcchHeader.MagicId)
                 throw new FormatException("Invalid Magic ID");
 
-            // TODO: Rest rest of header
-
+            // TODO: Read header
             source.Stream.Position = 0x190;
+
             ncch.Root.Add(new Node("sdk_info.txt", ReadBinaryChild(reader)));
             ncch.Root.Add(new Node("logo.bin", ReadBinaryChild(reader)));
             ncch.Root.Add(new Node("system.fs", ReadBinaryChild(reader)));
-            source.Stream.Position += 8; // TODO
+
+            // TODO: Read these fields
+            source.Stream.Position += 8;
 
             var rom = new Node("rom", ReadBinaryChild(reader));
             rom.Transform<BinaryIvfc2NodeContainer, BinaryFormat, NodeContainerFormat>();
             ncch.Root.Add(rom);
 
             // TODO: Read rest of header
-
             return ncch;
         }
 

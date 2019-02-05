@@ -25,10 +25,17 @@ namespace Lemon.Containers
 
     public class NcchHeader
     {
-        public static string MagicId { get { return "NCCH"; } }
+        public static string MagicId {
+            get { return "NCCH"; }
+        }
 
-        public static int Unit { get { return 0x200; } }
+        public static int Unit {
+            get { return 0x200; }
+        }
 
-        public byte[] Signature { get; set; }
+        public byte[] Signature {
+            get;
+            set;
+        }
     }
 }

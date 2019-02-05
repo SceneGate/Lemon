@@ -43,6 +43,8 @@ namespace Lemon.Containers
             ncsd.Header.Size = reader.ReadUInt32() * NcsdHeader.Unit;
             ncsd.Header.MediaId = reader.ReadUInt64();
             reader.Stream.Position += 8;
+
+            // TODO:
             // ncsd.Header.FileSystemType = reader.ReadBytes(Ncsd.NumPartitions)
             //     .Cast<NcsdFileSystemType>()
             //     .ToArray();
@@ -62,7 +64,6 @@ namespace Lemon.Containers
             }
 
             // TODO: Read rest of header
-
             return ncsd;
         }
 
