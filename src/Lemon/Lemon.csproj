@@ -1,11 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Lemon</AssemblyName>
+    <Product>SceneGate</Product>
+    <Version>0.1.0</Version>
+    <Description>Library for Nintendo 3DS file formats.</Description>
+
+    <Authors>pleonex</Authors>
+    <Company>SceneGate</Company>
+    <Copyright>Copyright (c) 2019 SceneGate</Copyright>
+    <RepositoryUrl>https://github.com/SceneGate/Lemon/</RepositoryUrl>
+    <License>GPL-3.0-or-later</License>
+    <PackageProjectUrl>https://github.com/SceneGate/Lemon/</PackageProjectUrl>
+    <PackageTags>romhacking;n3ds;scenegate</PackageTags>
+
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <RootNamespace>Lemon</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Yarhl" Version="2.0.0" />
+    <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="2.6.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.1-beta.61">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Text.Analyzers" Version="2.6.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

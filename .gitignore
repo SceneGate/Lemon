@@ -1,2 +1,29 @@
+# Output
 bin/
 obj/
+artifacts/
+
+# IDE
+*.userprefs
+*.user
+*.vs
+
+# Dependencies
+packages/
+
+# Linters and Tests
+TestResult.xml
+StyleCopViolations.xml
+StyleCop.Cache
+coverage_unit.xml
+coverage_integration.xml
+coverage_report/
+
+# Cake
+tools/*
+!tools/packages.config
+
+# Docs
+docs/_site/
+docs/api/
+doc-branch/
