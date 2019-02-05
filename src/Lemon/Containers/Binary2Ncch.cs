@@ -25,8 +25,16 @@ namespace Lemon.Containers
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
+    /// <summary>
+    /// Converter for Binary streams into a NCCH instance.
+    /// </summary>
     public class Binary2Ncch : IConverter<BinaryFormat, Ncch>
     {
+        /// <summary>
+        /// Converts a binary stream into a NCCH instance.
+        /// </summary>
+        /// <param name="source">Binary stream to convert.</param>
+        /// <returns>The new NCCH instance.</returns>
         public Ncch Convert(BinaryFormat source)
         {
             if (source == null)

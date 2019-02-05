@@ -23,13 +23,25 @@ namespace Lemon.Containers
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
 
+    /// <summary>
+    /// Nintendo Content Container Header.
+    /// This is the format for the CXI and CFA specialization.
+    /// It can contain upto two file systems and several special files.
+    /// </summary>
     public class Ncch : NodeContainerFormat
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Ncch"/> class.
+        /// </summary>
         public Ncch()
         {
             Header = new NcchHeader();
         }
 
+        /// <summary>
+        /// Gets or sets the header.
+        /// </summary>
+        /// <value>The header.</value>
         public NcchHeader Header {
             get;
             set;

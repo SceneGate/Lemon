@@ -26,20 +26,37 @@ namespace Lemon.Containers
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
+    /// <summary>
+    /// Converter for Binary streams into a file system following the
+    /// IVFC tree format.
+    /// </summary>
     public class BinaryIvfc2NodeContainer : IConverter<BinaryFormat, NodeContainerFormat>
     {
         uint dirInfoOffset;
         uint fileInfoOffset;
         uint fileDataOffset;
 
+        /// <summary>
+        /// Gets the magic identifier of the format.
+        /// </summary>
+        /// <value>The magic ID of the format.</value>
         public static string MagicId {
             get { return "IVFC"; }
         }
 
+        /// <summary>
+        /// Gets the supported format version.
+        /// </summary>
+        /// <value>The supported format version.</value>
         public static uint Version {
             get { return 0x0001_0000; }
         }
 
+        /// <summary>
+        /// Converts a binary stream into a file system with the IVFC format.
+        /// </summary>
+        /// <param name="source">The binary stream to convert.</param>
+        /// <returns>The file system from the IVFC stream.</returns>
         public NodeContainerFormat Convert(BinaryFormat source)
         {
             if (source == null)

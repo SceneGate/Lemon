@@ -21,7 +21,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Debug");
-var warningsAsError = Argument("warnaserror", false);
+var warningsAsError = Argument("warnaserror", true);
 
 string netstandardVersion = "2.0";
 string netstandardBinDir = $"bin/{configuration}/netstandard{netstandardVersion}";

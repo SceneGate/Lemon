@@ -25,8 +25,16 @@ namespace Lemon.Containers
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
+    /// <summary>
+    /// Converter for Binary streams into a NCSD instance.
+    /// </summary>
     public class Binary2Ncsd : IConverter<BinaryFormat, Ncsd>
     {
+        /// <summary>
+        /// Converts a binary stream into a NCSD instance.
+        /// </summary>
+        /// <param name="source">Binary stream to convert.</param>
+        /// <returns>The new NCSD instance.</returns>
         public Ncsd Convert(BinaryFormat source)
         {
             if (source == null)

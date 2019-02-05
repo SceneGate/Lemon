@@ -19,11 +19,29 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.Containers
 {
+    /// <summary>
+    /// NCSD partition file system type.
+    /// </summary>
     public enum NcsdFileSystemType
     {
+        /// <summary>
+        /// Regular partition.
+        /// </summary>
         None = 0,
+
+        /// <summary>
+        /// DS(i) firmware partition.
+        /// </summary>
         Normal = 1,
-        Firm = 3,
-        AgbFirm = 4,
+
+        /// <summary>
+        /// Firmware partition.
+        /// </summary>
+        Firmware = 3,
+
+        /// <summary>
+        /// GBA Firmware partition.
+        /// </summary>
+        AgbFirmware = 4,
     }
 }
