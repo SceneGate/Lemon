@@ -41,5 +41,20 @@ namespace Lemon.IntegrationTests.Containers
             get;
             set;
         }
+
+        public uint[] PartitionsOffset {
+            get;
+            set;
+        }
+
+        public uint[] PartitionsSize {
+            get;
+            set;
+        }
+
+        public string[] AvailablePartitions {
+            get;
+            set;
+        }
     }
 }

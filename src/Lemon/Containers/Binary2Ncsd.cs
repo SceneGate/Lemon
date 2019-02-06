@@ -60,6 +60,9 @@ namespace Lemon.Containers
             for (int i = 0; i < Ncsd.NumPartitions; i++) {
                 long offset = reader.ReadUInt32() * NcsdHeader.Unit;
                 long size = reader.ReadUInt32() * NcsdHeader.Unit;
+                if (size == 0) {
+                    continue;
+                }
 
                 var childBinary = new BinaryFormat(source.Stream, offset, size);
                 var child = new Node(GetPartitionName(i), childBinary);

@@ -50,13 +50,28 @@ namespace Lemon.IntegrationTests.Containers
         }
 
         [Test]
-        public void ValidateCciHeaderValues()
+        public void ValidateHeader()
         {
             var header = actual.Header;
             Assert.That(header.Signature, Has.Length.EqualTo(expected.SignatureLength));
             Assert.That(header.Size, Is.EqualTo(expected.Size));
             Assert.That(header.MediaId, Is.EqualTo(expected.MediaId));
             Assert.That(header.CryptType, Is.EquivalentTo(expected.CryptType));
+        }
+
+        [Test]
+        public void ValidatePartitions()
+        {
+            Assert.That(
+                actual.Root.Children,
+                Has.Count.EqualTo(expected.AvailablePartitions.Length));
+
+            for (int i = 0; i < actual.Root.Children.Count; i++) {
+                var child = actual.Root.Children[i];
+                Assert.That(child.Name, Is.EqualTo(expected.AvailablePartitions[i]));
+                Assert.That(child.Stream.Offset, Is.EqualTo(expected.PartitionsOffset[i]));
+                Assert.That(child.Stream.Length, Is.EqualTo(expected.PartitionsSize[i]));
+            }
         }
     }
 }
