@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Lemon.IntegrationTests</AssemblyName>
+    <Product>SceneGate</Product>
+    <Version>0.1.0</Version>
+    <Description>Integration tests for Lemon.</Description>
+
+    <Company>SceneGate</Company>
+    <Copyright>Copyright (c) 2019 SceneGate</Copyright>
+    <RepositoryUrl>https://github.com/SceneGate/Lemon/</RepositoryUrl>
+    <License>GPL-3.0-or-later</License>
+    <IsPackable>false</IsPackable>
+
+    <TargetFrameworks>netcoreapp2.1;net472</TargetFrameworks>
+    <RootNamespace>Lemon.IntegrationTests</RootNamespace>
+    <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.JSON" Version="12.0.1" />
+    <PackageReference Include="nunit" Version="3.10.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.csproj" />
+  </ItemGroup>
+
+</Project>
