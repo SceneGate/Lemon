@@ -29,7 +29,7 @@ namespace Lemon.IntegrationTests.Containers
     public class CciConverterTests
     {
         readonly Ncsd actual;
-        readonly Dictionary<string, string> expected;
+        readonly CciTestInfo expected;
 
         public CciConverterTests(string name)
         {
@@ -46,28 +46,17 @@ namespace Lemon.IntegrationTests.Containers
             actual = cciNode.GetFormatAs<Ncsd>();
 
             string json = File.ReadAllText(jsonPath);
-            expected = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            expected = JsonConvert.DeserializeObject<CciTestInfo>(json);
         }
 
         [Test]
         public void ValidateCciHeaderValues()
         {
             var header = actual.Header;
-            Assert.That(
-                header.Signature,
-                Has.Length.EqualTo(int.Parse(expected["header.signature_size"])));
-            Assert.That(
-                header.Size,
-                Is.EqualTo(int.Parse(expected["header.size"])));
-            Assert.That(
-                header.MediaId,
-                Is.EqualTo(ulong.Parse(expected["header.media_id"])));
-
-            byte[] expectedCrypt = expected["header.crypt_type"]
-                .Split(',')
-                .Select(b => byte.Parse(b))
-                .ToArray();
-            Assert.That(header.CryptType, Is.EquivalentTo(expectedCrypt));
+            Assert.That(header.Signature, Has.Length.EqualTo(expected.SignatureLength));
+            Assert.That(header.Size, Is.EqualTo(expected.Size));
+            Assert.That(header.MediaId, Is.EqualTo(expected.MediaId));
+            Assert.That(header.CryptType, Is.EquivalentTo(expected.CryptType));
         }
     }
 }
