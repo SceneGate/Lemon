@@ -1,9 +1,6 @@
 // Binary2Ncch.cs
 //
-// Author:
-//      Benito Palacios Sánchez (aka pleonex) <benito356@gmail.com>
-//
-// Copyright (c) 2019 Benito Palacios Sánchez
+// Copyright (c) 2019 SceneGate
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,36 +37,47 @@ namespace Lemon.Containers
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
+            var ncch = new Ncch();
             var reader = new DataReader(source.Stream);
 
-            var ncch = new Ncch();
-            ncch.Header.Signature = reader.ReadBytes(0x100);
-
+            // First read the header
+            var header = ncch.Header;
+            header.Signature = reader.ReadBytes(0x100);
             if (reader.ReadString(4) != NcchHeader.MagicId)
                 throw new FormatException("Invalid Magic ID");
 
             // TODO: Read header
             source.Stream.Position = 0x190;
 
-            ncch.Root.Add(new Node("sdk_info.txt", ReadBinaryChild(reader)));
-            ncch.Root.Add(new Node("logo.bin", ReadBinaryChild(reader)));
-            ncch.Root.Add(new Node("system.fs", ReadBinaryChild(reader)));
+            // Read the subfiles
+            AddChildIfExists("sdk_info.txt", ncch.Root, reader);
+            AddChildIfExists("logo.bin", ncch.Root, reader);
+            AddChildIfExists("system.fs", ncch.Root, reader);
 
             // TODO: Read these fields
             source.Stream.Position += 8;
-
-            var rom = new Node("rom", ReadBinaryChild(reader));
-            rom.Transform<BinaryIvfc2NodeContainer, BinaryFormat, NodeContainerFormat>();
-            ncch.Root.Add(rom);
+            AddChildIfExists("rom", ncch.Root, reader);
 
             // TODO: Read rest of header
             return ncch;
+        }
+
+        static void AddChildIfExists(string name, Node root, DataReader reader)
+        {
+            BinaryFormat binary = ReadBinaryChild(reader);
+            if (binary != null) {
+                root.Add(new Node(name, binary));
+            }
         }
 
         static BinaryFormat ReadBinaryChild(DataReader reader)
         {
             long offset = reader.ReadUInt32() * NcchHeader.Unit;
             long size = reader.ReadUInt32() * NcchHeader.Unit;
+            if (size == 0) {
+                return null;
+            }
+
             return new BinaryFormat(reader.Stream, offset, size);
         }
     }

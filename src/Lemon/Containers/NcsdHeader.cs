@@ -1,9 +1,6 @@
 // NcsdHeader.cs
 //
-// Author:
-//      Benito Palacios Sánchez (aka pleonex) <benito356@gmail.com>
-//
-// Copyright (c) 2019 Benito Palacios Sánchez
+// Copyright (c) 2019 SceneGate
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -84,7 +81,7 @@ namespace Lemon.Containers
             "Microsoft.Performance",
             "CA1819:PropertiesShouldNotReturnArrays",
             Justification="Model or DTO.")]
-        public NcsdFileSystemType[] FileSystemType {
+        public FileSystemType[] FileSystemType {
             get;
             set;
         }

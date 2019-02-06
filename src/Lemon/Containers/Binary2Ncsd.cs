@@ -1,9 +1,6 @@
 ﻿// Binary2Ncsd.cs
 //
-// Author:
-//      Benito Palacios Sánchez (aka pleonex) <benito356@gmail.com>
-//
-// Copyright (c) 2019 Benito Palacios Sánchez
+// Copyright (c) 2019 SceneGate
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,34 +37,32 @@ namespace Lemon.Containers
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
+            var ncsd = new Ncsd();
             var reader = new DataReader(source.Stream);
 
-            var ncsd = new Ncsd();
-            ncsd.Header.Signature = reader.ReadBytes(0x100);
-
+            // First read the header
+            var header = ncsd.Header;
+            header.Signature = reader.ReadBytes(0x100);
             if (reader.ReadString(4) != NcsdHeader.MagicId)
                 throw new FormatException("Invalid Magic ID");
 
-            ncsd.Header.Size = reader.ReadUInt32() * NcsdHeader.Unit;
-            ncsd.Header.MediaId = reader.ReadUInt64();
+            header.Size = reader.ReadUInt32() * NcsdHeader.Unit;
+            header.MediaId = reader.ReadUInt64();
             reader.Stream.Position += 8;
 
             // TODO:
             // ncsd.Header.FileSystemType = reader.ReadBytes(Ncsd.NumPartitions)
             //     .Cast<NcsdFileSystemType>()
             //     .ToArray();
-            ncsd.Header.CryptType = reader.ReadBytes(Ncsd.NumPartitions);
+            header.CryptType = reader.ReadBytes(Ncsd.NumPartitions);
 
+            // Now add the subfiles / partitions
             for (int i = 0; i < Ncsd.NumPartitions; i++) {
                 long offset = reader.ReadUInt32() * NcsdHeader.Unit;
                 long size = reader.ReadUInt32() * NcsdHeader.Unit;
 
                 var childBinary = new BinaryFormat(source.Stream, offset, size);
                 var child = new Node(GetPartitionName(i), childBinary);
-                if (i == 0) {
-                    child.Transform<Binary2Ncch, BinaryFormat, Ncch>();
-                }
-
                 ncsd.Root.Add(child);
             }
 

@@ -1,9 +1,6 @@
-// NcsdFileSystemType.cs
+// FileSystemType.cs
 //
-// Author:
-//      Benito Palacios Sánchez (aka pleonex) <benito356@gmail.com>
-//
-// Copyright (c) 2019 Benito Palacios Sánchez
+// Copyright (c) 2019 SceneGate
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,9 +17,9 @@
 namespace Lemon.Containers
 {
     /// <summary>
-    /// NCSD partition file system type.
+    /// File system type.
     /// </summary>
-    public enum NcsdFileSystemType
+    public enum FileSystemType
     {
         /// <summary>
         /// Regular partition.
