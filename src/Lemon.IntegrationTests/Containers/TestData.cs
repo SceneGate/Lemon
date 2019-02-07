@@ -19,13 +19,14 @@ namespace Lemon.IntegrationTests.Containers
     using System;
     using System.Collections;
     using System.IO;
+    using System.Linq;
     using NUnit.Framework;
 
     public class TestData
     {
         public static string ResourcePath {
             get {
-                var programDir = AppDomain.CurrentDomain.BaseDirectory;
+                string programDir = AppDomain.CurrentDomain.BaseDirectory;
                 return Path.Combine(
                     programDir,
                     "..", "..", "..", "..", "..",
@@ -36,7 +37,14 @@ namespace Lemon.IntegrationTests.Containers
 
         public static IEnumerable CciParams {
             get {
-                yield return new TestFixtureData("aofm");
+                string listFile = Path.Combine(ResourcePath, "cci.txt");
+                return File.ReadAllLines(listFile)
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Select(line => line.Trim())
+                    .Where(line => !line.StartsWith("#"))
+                    .Select(line => new TestFixtureData(
+                        Path.Combine(ResourcePath, line + ".3ds"),
+                        Path.Combine(ResourcePath, line + ".json")));
             }
         }
     }

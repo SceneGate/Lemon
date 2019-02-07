@@ -24,29 +24,45 @@ namespace Lemon.IntegrationTests.Containers
     using Newtonsoft.Json;
     using NUnit.Framework;
     using Yarhl.FileSystem;
+    using Yarhl.IO;
 
     [TestFixtureSource(typeof(TestData), "CciParams")]
     public class CciConverterTests
     {
-        readonly Ncsd actual;
-        readonly CciTestInfo expected;
+        readonly string cciPath;
+        readonly string jsonPath;
 
-        public CciConverterTests(string name)
+        Node actualNode;
+        Ncsd actual;
+        CciTestInfo expected;
+
+        public CciConverterTests(string cciPath, string jsonPath)
         {
-            string cciPath = Path.Combine(TestData.ResourcePath, name + ".3ds");
-            string jsonPath = Path.Combine(TestData.ResourcePath, name + ".json");
+            this.cciPath = cciPath;
+            this.jsonPath = jsonPath;
+        }
 
+        [OneTimeSetUp]
+        public void SetUpFixture()
+        {
             if (!File.Exists(cciPath))
                 Assert.Ignore("CCI file doesn't exist");
             if (!File.Exists(jsonPath))
                 Assert.Ignore("JSON file doesn't exist");
 
-            var cciNode = NodeFactory.FromFile(cciPath);
-            Assert.That(() => cciNode.Transform<Ncsd>(), Throws.Nothing);
-            actual = cciNode.GetFormatAs<Ncsd>();
+            actualNode = NodeFactory.FromFile(cciPath);
+            Assert.That(() => actualNode.Transform<Ncsd>(), Throws.Nothing);
+            actual = actualNode.GetFormatAs<Ncsd>();
 
             string json = File.ReadAllText(jsonPath);
             expected = JsonConvert.DeserializeObject<CciTestInfo>(json);
+        }
+
+        [OneTimeTearDown]
+        public void TearDownFixture()
+        {
+            actualNode.Dispose();
+            Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
         }
 
         [Test]
