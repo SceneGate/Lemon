@@ -1,4 +1,4 @@
-// TestData.cs
+// TestDataBase.cs
 //
 // Copyright (c) 2019 SceneGate
 //
@@ -14,29 +14,30 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-namespace Lemon.IntegrationTests.Containers
+namespace Lemon.IntegrationTests
 {
     using System;
-    using System.Collections;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using NUnit.Framework;
 
-    public class TestData : TestDataBase
+    public abstract class TestDataBase
     {
-        public static string ContainersResources {
+        protected static string RootFromOutputPath {
             get {
-                return Path.Combine(RootFromOutputPath, "test_resources", "containers");
+                string programDir = AppDomain.CurrentDomain.BaseDirectory;
+                return Path.Combine(
+                    programDir,
+                    "..", "..", "..", "..", "..");
             }
         }
 
-        public static IEnumerable CciParams {
-            get {
-                return ReadTestListFile(Path.Combine(ContainersResources, "cci.txt"))
-                    .Select(name => new TestFixtureData(
-                        Path.Combine(ContainersResources, name + ".3ds"),
-                        Path.Combine(ContainersResources, name + ".json")));
-            }
+        protected static IEnumerable<string> ReadTestListFile(string filePath)
+        {
+            return File.ReadAllLines(filePath)
+                .Where(line => !string.IsNullOrWhiteSpace(line))
+                .Select(line => line.Trim())
+                .Where(line => !line.StartsWith("#"));
         }
     }
 }
