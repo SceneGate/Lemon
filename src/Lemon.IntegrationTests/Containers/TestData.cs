@@ -38,5 +38,17 @@ namespace Lemon.IntegrationTests.Containers
                         Path.Combine(ContainersResources, name + ".json")));
             }
         }
+
+        public static IEnumerable NcchParams {
+            get {
+                return ReadTestListFile(Path.Combine(ContainersResources, "ncch.txt"))
+                    .Select(line => line.Split(','))
+                    .Select(data => new TestFixtureData(
+                        Path.Combine(ContainersResources, data[0]),
+                        Path.Combine(ContainersResources, data[1]),
+                        int.Parse(data[2]),
+                        int.Parse(data[3])));
+            }
+        }
     }
 }
