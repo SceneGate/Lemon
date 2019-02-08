@@ -1,0 +1,6 @@
+{
+    "signature_length": 256,
+    "regions_offset": [2560, 3072, 1175552],
+    "regions_size": [512, 1169408, 184934400],
+    "available_regions": ["sdk_info.txt", "system.fs", "rom"]
+}

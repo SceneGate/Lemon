@@ -33,9 +33,10 @@ namespace Lemon.IntegrationTests.Containers
         public static IEnumerable NcsdParams {
             get {
                 return ReadTestListFile(Path.Combine(ContainersResources, "ncsd.txt"))
-                    .Select(name => new TestFixtureData(
-                        Path.Combine(ContainersResources, name + ".3ds"),
-                        Path.Combine(ContainersResources, name + ".json")));
+                    .Select(line => line.Split(','))
+                    .Select(data => new TestFixtureData(
+                        Path.Combine(ContainersResources, data[0]),
+                        Path.Combine(ContainersResources, data[1])));
             }
         }
 

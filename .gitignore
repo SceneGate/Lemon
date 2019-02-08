@@ -2,6 +2,7 @@
 bin/
 obj/
 artifacts/
+*.bak
 
 # IDE
 *.userprefs
@@ -27,7 +28,3 @@ tools/*
 docs/_site/
 docs/api/
 doc-branch/
-
-# Test resources
-test_resources/containers/*
-!test_resources/**/*.json

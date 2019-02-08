@@ -1,0 +1,6 @@
+{
+    "signature_length": 256,
+    "regions_offset": [512],
+    "regions_size": [512],
+    "available_regions": ["rom"]
+}

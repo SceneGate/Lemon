@@ -37,7 +37,7 @@ namespace Lemon.IntegrationTests.Containers
 
         Node actualNode;
         Ncch actual;
-        // NcsdTestInfo expected;
+        NcchTestInfo expected;
 
         public NcchConverterTests(string jsonPath, string binaryPath, int offset, int size)
         {
@@ -51,9 +51,9 @@ namespace Lemon.IntegrationTests.Containers
         public void SetUpFixture()
         {
             if (!File.Exists(binaryPath))
-                Assert.Ignore("Binary file doesn't exist");
-            // if (!File.Exists(jsonPath))
-                // Assert.Ignore("JSON file doesn't exist");
+                Assert.Ignore($"Binary file doesn't exist: {binaryPath}");
+            if (!File.Exists(jsonPath))
+                Assert.Ignore($"JSON file doesn't exist: {jsonPath}");
 
             using (var stream = new DataStream(binaryPath, offset, size, FileOpenMode.Read)) {
                 actualNode = new Node("actual", new BinaryFormat(stream));
@@ -62,21 +62,37 @@ namespace Lemon.IntegrationTests.Containers
             Assert.That(() => actualNode.Transform<Ncch>(), Throws.Nothing);
             actual = actualNode.GetFormatAs<Ncch>();
 
-            // string json = File.ReadAllText(jsonPath);
-            // expected = JsonConvert.DeserializeObject<NcsdTestInfo>(json);
+            string json = File.ReadAllText(jsonPath);
+            expected = JsonConvert.DeserializeObject<NcchTestInfo>(json);
         }
 
         [OneTimeTearDown]
         public void TearDownFixture()
         {
-            actualNode.Dispose();
+            actualNode?.Dispose();
             Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
         }
 
         [Test]
         public void ValidateHeader()
         {
-            Assert.Pass();
+            var header = actual.Header;
+            Assert.That(header.Signature, Has.Length.EqualTo(expected.SignatureLength));
+        }
+
+        [Test]
+        public void ValidateRegions()
+        {
+            Assert.That(
+                actual.Root.Children,
+                Has.Count.EqualTo(expected.AvailableRegions.Length));
+
+            for (int i = 0; i < actual.Root.Children.Count; i++) {
+                var child = actual.Root.Children[i];
+                Assert.That(child.Name, Is.EqualTo(expected.AvailableRegions[i]));
+                Assert.That(child.Stream.Offset, Is.EqualTo(offset + expected.RegionsOffset[i]));
+                Assert.That(child.Stream.Length, Is.EqualTo(expected.RegionsSize[i]));
+            }
         }
     }
 }

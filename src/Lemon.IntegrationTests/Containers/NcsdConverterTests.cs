@@ -46,9 +46,9 @@ namespace Lemon.IntegrationTests.Containers
         public void SetUpFixture()
         {
             if (!File.Exists(ncsdPath))
-                Assert.Ignore("NCSD file doesn't exist");
+                Assert.Ignore($"NCSD file doesn't exist: {ncsdPath}");
             if (!File.Exists(jsonPath))
-                Assert.Ignore("JSON file doesn't exist");
+                Assert.Ignore($"JSON file doesn't exist: {jsonPath}");
 
             actualNode = NodeFactory.FromFile(ncsdPath);
             Assert.That(() => actualNode.Transform<Ncsd>(), Throws.Nothing);
@@ -61,7 +61,7 @@ namespace Lemon.IntegrationTests.Containers
         [OneTimeTearDown]
         public void TearDownFixture()
         {
-            actualNode.Dispose();
+            actualNode?.Dispose();
             Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
         }
 
