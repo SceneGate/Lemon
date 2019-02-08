@@ -1,4 +1,4 @@
-// CciTestInfo.cs
+// NcsdTestInfo.cs
 //
 // Copyright (c) 2019 SceneGate
 //
@@ -20,7 +20,7 @@ namespace Lemon.IntegrationTests.Containers
     using Newtonsoft.Json.Serialization;
 
     [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-    public class CciTestInfo
+    public class NcsdTestInfo
     {
         public int SignatureLength {
             get;

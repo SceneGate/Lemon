@@ -30,9 +30,9 @@ namespace Lemon.IntegrationTests.Containers
             }
         }
 
-        public static IEnumerable CciParams {
+        public static IEnumerable NcsdParams {
             get {
-                return ReadTestListFile(Path.Combine(ContainersResources, "cci.txt"))
+                return ReadTestListFile(Path.Combine(ContainersResources, "ncsd.txt"))
                     .Select(name => new TestFixtureData(
                         Path.Combine(ContainersResources, name + ".3ds"),
                         Path.Combine(ContainersResources, name + ".json")));

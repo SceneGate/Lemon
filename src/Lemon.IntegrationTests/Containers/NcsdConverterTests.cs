@@ -1,4 +1,4 @@
-// CciConverterTests.cs
+// NcsdConverterTests.cs
 //
 // Copyright (c) 2019 SceneGate
 //
@@ -26,36 +26,36 @@ namespace Lemon.IntegrationTests.Containers
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
-    [TestFixtureSource(typeof(TestData), "CciParams")]
-    public class CciConverterTests
+    [TestFixtureSource(typeof(TestData), nameof(TestData.NcsdParams))]
+    public class NcsdConverterTests
     {
-        readonly string cciPath;
+        readonly string ncsdPath;
         readonly string jsonPath;
 
         Node actualNode;
         Ncsd actual;
-        CciTestInfo expected;
+        NcsdTestInfo expected;
 
-        public CciConverterTests(string cciPath, string jsonPath)
+        public NcsdConverterTests(string ncsdPath, string jsonPath)
         {
-            this.cciPath = cciPath;
+            this.ncsdPath = ncsdPath;
             this.jsonPath = jsonPath;
         }
 
         [OneTimeSetUp]
         public void SetUpFixture()
         {
-            if (!File.Exists(cciPath))
-                Assert.Ignore("CCI file doesn't exist");
+            if (!File.Exists(ncsdPath))
+                Assert.Ignore("NCSD file doesn't exist");
             if (!File.Exists(jsonPath))
                 Assert.Ignore("JSON file doesn't exist");
 
-            actualNode = NodeFactory.FromFile(cciPath);
+            actualNode = NodeFactory.FromFile(ncsdPath);
             Assert.That(() => actualNode.Transform<Ncsd>(), Throws.Nothing);
             actual = actualNode.GetFormatAs<Ncsd>();
 
             string json = File.ReadAllText(jsonPath);
-            expected = JsonConvert.DeserializeObject<CciTestInfo>(json);
+            expected = JsonConvert.DeserializeObject<NcsdTestInfo>(json);
         }
 
         [OneTimeTearDown]
