@@ -25,15 +25,23 @@ namespace Lemon.IntegrationTests
     {
         protected static string RootFromOutputPath {
             get {
+                string envVar = Environment.GetEnvironmentVariable("YARHL_TEST_DIR");
+                if (!string.IsNullOrEmpty(envVar))
+                    return envVar;
+
                 string programDir = AppDomain.CurrentDomain.BaseDirectory;
                 return Path.Combine(
                     programDir,
-                    "..", "..", "..", "..", "..");
+                    "..", "..", "..", "..", "..",
+                    "test_resources");
             }
         }
 
         protected static IEnumerable<string> ReadTestListFile(string filePath)
         {
+            if (!File.Exists(filePath))
+                return Array.Empty<string>();
+
             return File.ReadAllLines(filePath)
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.Trim())

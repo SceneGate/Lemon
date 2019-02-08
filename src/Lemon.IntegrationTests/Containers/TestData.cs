@@ -26,7 +26,7 @@ namespace Lemon.IntegrationTests.Containers
     {
         public static string ContainersResources {
             get {
-                return Path.Combine(RootFromOutputPath, "test_resources", "containers");
+                return Path.Combine(RootFromOutputPath, "containers");
             }
         }
 
