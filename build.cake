@@ -90,6 +90,9 @@ Task("Default")
     .IsDependentOn("Build")
     .IsDependentOn("Run-IntegrationTests");
 
+Task("Travis")
+    .IsDependentOn("Default");
+
 RunTarget(target);
 
 
