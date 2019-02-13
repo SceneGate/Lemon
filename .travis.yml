@@ -19,6 +19,7 @@ before_install:
   fi
 
 before_script:
+- git lfs install
 - git lfs pull
 
 script:
