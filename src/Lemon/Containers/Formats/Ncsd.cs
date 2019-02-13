@@ -1,4 +1,4 @@
-// NcchHeader.cs
+// Ncsd.cs
 //
 // Author:
 //      Benito Palacios Sánchez (aka pleonex) <benito356@gmail.com>
@@ -17,43 +17,40 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-namespace Lemon.Containers
+namespace Lemon.Containers.Formats
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
 
     /// <summary>
-    /// NCCH header information.
+    /// Nintendo CTR SD.
+    /// This is the format for the CCI, NAND and CSU specializations.
+    /// It can contains upto 8 containers / nodes.
     /// </summary>
-    public class NcchHeader
+    public class Ncsd : NodeContainerFormat
     {
         /// <summary>
-        /// Gets the magic identifier of the format.
+        /// Initializes a new instance of the <see cref="Ncsd"/> class.
         /// </summary>
-        /// <value>The magic ID of the format.</value>
-        public static string MagicId {
-            get { return "NCCH"; }
+        public Ncsd()
+        {
+            Header = new NcsdHeader();
         }
 
         /// <summary>
-        /// Gets the equivalent in bytes of one unit for the header values.
+        /// Gets the maximum number of partitions on a Ncsd format.
         /// </summary>
-        /// <value>One unit in bytes.</value>
-        public static int Unit {
-            get { return 0x200; }
+        /// <value>The maximum number of partitions.</value>
+        public static int NumPartitions {
+            get { return 8; }
         }
 
         /// <summary>
-        /// Gets or sets the RSA-2048 signature of the NCCH header using SHA-256.
+        /// Gets or sets the header.
         /// </summary>
-        /// <value>The signature of the header.</value>
-        [SuppressMessage(
-            "Microsoft.Performance",
-            "CA1819:PropertiesShouldNotReturnArrays",
-            Justification="Model or DTO.")]
-        public byte[] Signature {
+        /// <value>The header.</value>
+        public NcsdHeader Header {
             get;
             set;
         }

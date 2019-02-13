@@ -1,9 +1,6 @@
-// Ncch.cs
+// FirmwareType.cs
 //
-// Author:
-//      Benito Palacios Sánchez (aka pleonex) <benito356@gmail.com>
-//
-// Copyright (c) 2019 Benito Palacios Sánchez
+// Copyright (c) 2019 SceneGate
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,34 +14,31 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-namespace Lemon.Containers
+namespace Lemon.Containers.Formats
 {
-    using System;
-    using Yarhl.FileFormat;
-    using Yarhl.FileSystem;
-
     /// <summary>
-    /// Nintendo Content Container Header.
-    /// This is the format for the CXI and CFA specialization.
-    /// It can contain upto two file systems and several special files.
+    /// File system type.
     /// </summary>
-    public class Ncch : NodeContainerFormat
+    public enum FirmwareType
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Ncch"/> class.
+        /// Regular partition.
         /// </summary>
-        public Ncch()
-        {
-            Header = new NcchHeader();
-        }
+        None = 0,
 
         /// <summary>
-        /// Gets or sets the header.
+        /// DS(i) firmware partition.
         /// </summary>
-        /// <value>The header.</value>
-        public NcchHeader Header {
-            get;
-            set;
-        }
+        Normal = 1,
+
+        /// <summary>
+        /// Firmware partition.
+        /// </summary>
+        Firmware = 3,
+
+        /// <summary>
+        /// GBA Firmware partition.
+        /// </summary>
+        AgbFirmware = 4,
     }
 }

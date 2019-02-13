@@ -20,7 +20,8 @@ namespace Lemon.IntegrationTests.Containers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Lemon.Containers;
+    using Lemon.Containers.Converters;
+    using Lemon.Containers.Formats;
     using Newtonsoft.Json;
     using NUnit.Framework;
     using Yarhl.FileFormat;

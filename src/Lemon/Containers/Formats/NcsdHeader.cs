@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-namespace Lemon.Containers
+namespace Lemon.Containers.Formats
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -74,14 +74,14 @@ namespace Lemon.Containers
         }
 
         /// <summary>
-        /// Gets or sets the type of the file system for each partition.
+        /// Gets or sets the type of the firmware for each partition.
         /// </summary>
-        /// <value>The type of the file system of each partition.</value>
+        /// <value>The type of the partitions firmware.</value>
         [SuppressMessage(
             "Microsoft.Performance",
             "CA1819:PropertiesShouldNotReturnArrays",
             Justification="Model or DTO.")]
-        public FileSystemType[] FileSystemType {
+        public FirmwareType[] FirmwaresType {
             get;
             set;
         }

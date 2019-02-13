@@ -16,6 +16,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.IntegrationTests.Containers
 {
+    using Lemon.Containers.Converters;
+    using Lemon.Containers.Formats;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
 
@@ -38,6 +40,11 @@ namespace Lemon.IntegrationTests.Containers
         }
 
         public byte[] CryptType {
+            get;
+            set;
+        }
+
+        public FirmwareType[] FirmwaresType{
             get;
             set;
         }

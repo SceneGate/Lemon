@@ -20,7 +20,8 @@ namespace Lemon.IntegrationTests.Containers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Lemon.Containers;
+    using Lemon.Containers.Converters;
+    using Lemon.Containers.Formats;
     using Newtonsoft.Json;
     using NUnit.Framework;
     using Yarhl.FileSystem;
@@ -72,6 +73,7 @@ namespace Lemon.IntegrationTests.Containers
             Assert.That(header.Signature, Has.Length.EqualTo(expected.SignatureLength));
             Assert.That(header.Size, Is.EqualTo(expected.Size));
             Assert.That(header.MediaId, Is.EqualTo(expected.MediaId));
+            Assert.That(header.FirmwaresType, Is.EquivalentTo(expected.FirmwaresType));
             Assert.That(header.CryptType, Is.EquivalentTo(expected.CryptType));
         }
 

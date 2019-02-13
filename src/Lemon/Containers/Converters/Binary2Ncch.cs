@@ -14,10 +14,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-namespace Lemon.Containers
+namespace Lemon.Containers.Converters
 {
     using System;
     using System.Linq;
+    using Lemon.Containers.Formats;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;

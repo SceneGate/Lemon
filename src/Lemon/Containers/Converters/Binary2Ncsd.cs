@@ -14,10 +14,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-namespace Lemon.Containers
+namespace Lemon.Containers.Converters
 {
     using System;
     using System.Linq;
+    using Lemon.Containers.Formats;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
@@ -27,6 +28,29 @@ namespace Lemon.Containers
     /// </summary>
     public class Binary2Ncsd : IConverter<BinaryFormat, Ncsd>
     {
+        /// <summary>
+        /// Gets the name of a partition from its index.
+        /// </summary>
+        /// <param name="index">Index of the partition.</param>
+        /// <returns>The associated partition's name.</returns>
+        public static string GetPartitionName(int index)
+        {
+            switch (index) {
+                case 0:
+                    return "program";
+                case 1:
+                    return "manual";
+                case 2:
+                    return "download_play";
+                case 6:
+                    return "new3ds_update";
+                case 7:
+                    return "update";
+                default:
+                    throw new FormatException("Unsupported partition");
+            }
+        }
+
         /// <summary>
         /// Converts a binary stream into a NCSD instance.
         /// </summary>
@@ -48,12 +72,9 @@ namespace Lemon.Containers
 
             header.Size = reader.ReadUInt32() * NcsdHeader.Unit;
             header.MediaId = reader.ReadUInt64();
-            reader.Stream.Position += 8;
-
-            // TODO:
-            // ncsd.Header.FileSystemType = reader.ReadBytes(Ncsd.NumPartitions)
-            //     .Cast<NcsdFileSystemType>()
-            //     .ToArray();
+            header.FirmwaresType = reader.ReadBytes(Ncsd.NumPartitions)
+                .Select(x => (FirmwareType)x)
+                .ToArray();
             header.CryptType = reader.ReadBytes(Ncsd.NumPartitions);
 
             // Now add the subfiles / partitions
@@ -71,24 +92,6 @@ namespace Lemon.Containers
 
             // TODO: Read rest of header
             return ncsd;
-        }
-
-        static string GetPartitionName(int index)
-        {
-            switch (index) {
-                case 0:
-                    return "program";
-                case 1:
-                    return "manual.cfa";
-                case 2:
-                    return "download_play.cfa";
-                case 6:
-                    return "new3ds_update.cfa";
-                case 7:
-                    return "update.cfa";
-                default:
-                    return $"partition{index}.bin";
-            }
         }
     }
 }
