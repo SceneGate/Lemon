@@ -3,3 +3,4 @@ fake.ncsd,fake_ncsd.json
 
 # Optionals not committed
 aofm.3ds,aofm.json
+update.csu,update.json
