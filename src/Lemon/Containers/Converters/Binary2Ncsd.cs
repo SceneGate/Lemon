@@ -85,8 +85,11 @@ namespace Lemon.Containers.Converters
                     continue;
                 }
 
+                string name = (header.FirmwaresType[i] == FirmwareType.None)
+                    ? GetPartitionName(i)
+                    : $"firm{i}";
                 var childBinary = new BinaryFormat(source.Stream, offset, size);
-                var child = new Node(GetPartitionName(i), childBinary);
+                var child = new Node(name, childBinary);
                 ncsd.Root.Add(child);
             }
 
