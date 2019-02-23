@@ -37,16 +37,18 @@ namespace Lemon.Containers
                 throw new ArgumentException("Invalid node format", nameof(gameNode));
 
             // First transform the binary format into NCSD (CCI/CSU/NAND).
-            gameNode.Transform<Ncsd>();
+            gameNode.Transform<Binary2Ncsd, BinaryFormat, Ncsd>();
 
             // All the partition have NCCH format.
             foreach (var partition in gameNode.Children) {
-                partition.Transform<Ncch>();
+                partition.Transform<Binary2Ncch, BinaryFormat, Ncch>();
             }
 
             // Unpack each partition until we have the actual file system.
             gameNode.Children["program"].Children["rom"]
                 .Transform<BinaryIvfc2NodeContainer, BinaryFormat, NodeContainerFormat>();
+            gameNode.Children["program"].Children["system"]
+                .Transform<BinaryExeFs2NodeContainer, BinaryFormat, NodeContainerFormat>();
         }
     }
 }

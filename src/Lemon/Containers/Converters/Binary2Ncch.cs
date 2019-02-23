@@ -53,7 +53,7 @@ namespace Lemon.Containers.Converters
             // Read the subfiles
             AddChildIfExists("sdk_info.txt", ncch.Root, reader);
             AddChildIfExists("logo.bin", ncch.Root, reader);
-            AddChildIfExists("system.fs", ncch.Root, reader);
+            AddChildIfExists("system", ncch.Root, reader);
 
             // TODO: Read these fields
             source.Stream.Position += 8;
