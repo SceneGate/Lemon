@@ -21,8 +21,13 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Debug");
-var warningsAsError = Argument("warnaserror", true);
 var tests = Argument("tests", string.Empty);
+var warningsAsError = Argument("warnaserror", true);
+var warnAsErrorOption = warningsAsError
+    ? MSBuildTreatAllWarningsAs.Error
+    : MSBuildTreatAllWarningsAs.Default;
+
+string solutionPath = "src/Lemon.sln";
 
 string netstandardVersion = "2.0";
 string netstandardBinDir = $"bin/{configuration}/netstandard{netstandardVersion}";
@@ -30,29 +35,31 @@ string netstandardBinDir = $"bin/{configuration}/netstandard{netstandardVersion}
 string netVersion = "472";
 string netBinDir = $"bin/{configuration}/net{netVersion}";
 
-string netcoreVersion = "2.1";
+string netcoreVersion = "2.2";
 string netcoreBinDir = $"bin/{configuration}/netcoreapp{netcoreVersion}";
 
 Task("Clean")
     .Does(() =>
 {
-    MSBuild("src/Lemon.sln", configurator => configurator
-        .WithTarget("Clean")
-        .SetVerbosity(Verbosity.Minimal)
-        .SetConfiguration(configuration));
+    DotNetCoreClean(solutionPath, new DotNetCoreCleanSettings {
+        Configuration = "Debug",
+        Verbosity = DotNetCoreVerbosity.Minimal,
+    });
+    DotNetCoreClean(solutionPath, new DotNetCoreCleanSettings {
+        Configuration = "Release",
+        Verbosity = DotNetCoreVerbosity.Minimal,
+    });
 });
 
 Task("Build")
     .Does(() =>
 {
-    var msbuildConfig = new MSBuildSettings {
-        Verbosity = Verbosity.Minimal,
+    DotNetCoreBuild(solutionPath, new DotNetCoreBuildSettings {
         Configuration = configuration,
-        Restore = true,
-        MaxCpuCount = 0,  // Auto build parallel mode
-        WarningsAsError = warningsAsError,
-    };
-    MSBuild("src/Lemon.sln", msbuildConfig);
+        Verbosity = DotNetCoreVerbosity.Minimal,
+        MSBuildSettings = new DotNetCoreMSBuildSettings()
+            .TreatAllWarningsAs(warnAsErrorOption),
+    });
 });
 
 Task("Run-IntegrationTests")

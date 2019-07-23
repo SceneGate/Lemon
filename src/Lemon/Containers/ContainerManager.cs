@@ -18,9 +18,8 @@ namespace Lemon.Containers
 {
     using System;
     using Lemon.Containers.Converters;
-    using Lemon.Containers.Formats;
-    using Yarhl.FileFormat;
     using Yarhl.FileSystem;
+    using Yarhl.IO;
 
     /// <summary>
     /// Manage containers for 3DS formats.
@@ -33,22 +32,25 @@ namespace Lemon.Containers
         /// <param name="gameNode">Node to unpack with .3ds format.</param>
         public static void Unpack3DSNode(Node gameNode)
         {
-            if (!(gameNode.Format is BinaryFormat))
+            if (gameNode == null)
+                throw new ArgumentNullException(nameof(gameNode));
+
+            if (!(gameNode.Format is IBinary))
                 throw new ArgumentException("Invalid node format", nameof(gameNode));
 
             // First transform the binary format into NCSD (CCI/CSU/NAND).
-            gameNode.Transform<Binary2Ncsd, BinaryFormat, Ncsd>();
+            gameNode.TransformWith<Binary2Ncsd>();
 
             // All the partition have NCCH format.
             foreach (var partition in gameNode.Children) {
-                partition.Transform<Binary2Ncch, BinaryFormat, Ncch>();
+                partition.TransformWith<Binary2Ncch>();
             }
 
             // Unpack each partition until we have the actual file system.
             gameNode.Children["program"].Children["rom"]
-                .Transform<BinaryIvfc2NodeContainer, BinaryFormat, NodeContainerFormat>();
+                .TransformWith<BinaryIvfc2NodeContainer>();
             gameNode.Children["program"].Children["system"]
-                .Transform<BinaryExeFs2NodeContainer, BinaryFormat, NodeContainerFormat>();
+                .TransformWith<BinaryExeFs2NodeContainer>();
         }
     }
 }

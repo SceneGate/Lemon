@@ -17,14 +17,10 @@
 namespace Lemon.IntegrationTests.Containers
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using Lemon.Containers.Converters;
     using Lemon.Containers.Formats;
     using Newtonsoft.Json;
     using NUnit.Framework;
-    using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
@@ -56,11 +52,11 @@ namespace Lemon.IntegrationTests.Containers
             if (!File.Exists(jsonPath))
                 Assert.Ignore($"JSON file doesn't exist: {jsonPath}");
 
-            using (var stream = new DataStream(binaryPath, offset, size, FileOpenMode.Read)) {
+            using (var stream = new DataStream(binaryPath, FileOpenMode.Read, offset, size)) {
                 actualNode = new Node("actual", new BinaryFormat(stream));
             }
 
-            Assert.That(() => actualNode.Transform<Ncch>(), Throws.Nothing);
+            Assert.That(() => actualNode.TransformTo<Ncch>(), Throws.Nothing);
             actual = actualNode.GetFormatAs<Ncch>();
 
             string json = File.ReadAllText(jsonPath);

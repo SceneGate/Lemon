@@ -22,17 +22,17 @@ namespace Lemon.IntegrationTests.Containers
     using System.Linq;
     using NUnit.Framework;
 
-    public class TestData : TestDataBase
+    public class TestData
     {
         public static string ContainersResources {
             get {
-                return Path.Combine(RootFromOutputPath, "containers");
+                return Path.Combine(TestDataBase.RootFromOutputPath, "containers");
             }
         }
 
         public static IEnumerable NcsdParams {
             get {
-                return ReadTestListFile(Path.Combine(ContainersResources, "ncsd.txt"))
+                return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, "ncsd.txt"))
                     .Select(line => line.Split(','))
                     .Select(data => new TestFixtureData(
                         Path.Combine(ContainersResources, data[0]),
@@ -42,7 +42,7 @@ namespace Lemon.IntegrationTests.Containers
 
         public static IEnumerable NcchParams {
             get {
-                return ReadTestListFile(Path.Combine(ContainersResources, "ncch.txt"))
+                return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, "ncch.txt"))
                     .Select(line => line.Split(','))
                     .Select(data => new TestFixtureData(
                         Path.Combine(ContainersResources, data[0]),

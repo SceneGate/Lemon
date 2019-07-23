@@ -17,10 +17,7 @@
 namespace Lemon.IntegrationTests.Containers
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using Lemon.Containers.Converters;
     using Lemon.Containers.Formats;
     using Newtonsoft.Json;
     using NUnit.Framework;
@@ -52,7 +49,7 @@ namespace Lemon.IntegrationTests.Containers
                 Assert.Ignore($"JSON file doesn't exist: {jsonPath}");
 
             actualNode = NodeFactory.FromFile(ncsdPath);
-            Assert.That(() => actualNode.Transform<Ncsd>(), Throws.Nothing);
+            Assert.That(() => actualNode.TransformTo<Ncsd>(), Throws.Nothing);
             actual = actualNode.GetFormatAs<Ncsd>();
 
             string json = File.ReadAllText(jsonPath);

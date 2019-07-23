@@ -21,9 +21,9 @@ namespace Lemon.IntegrationTests
     using System.IO;
     using System.Linq;
 
-    public abstract class TestDataBase
+    public static class TestDataBase
     {
-        protected static string RootFromOutputPath {
+        public static string RootFromOutputPath {
             get {
                 string envVar = Environment.GetEnvironmentVariable("YARHL_TEST_DIR");
                 if (!string.IsNullOrEmpty(envVar))
@@ -37,7 +37,7 @@ namespace Lemon.IntegrationTests
             }
         }
 
-        protected static IEnumerable<string> ReadTestListFile(string filePath)
+        public static IEnumerable<string> ReadTestListFile(string filePath)
         {
             if (!File.Exists(filePath))
                 return Array.Empty<string>();
