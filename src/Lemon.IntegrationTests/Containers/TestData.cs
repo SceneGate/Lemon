@@ -51,5 +51,17 @@ namespace Lemon.IntegrationTests.Containers
                         int.Parse(data[3])));
             }
         }
+
+        public static IEnumerable ExeFsParams {
+            get {
+                return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, "exefs.txt"))
+                    .Select(line => line.Split(','))
+                    .Select(data => new TestFixtureData(
+                        Path.Combine(ContainersResources, data[0]),
+                        Path.Combine(ContainersResources, data[1]),
+                        int.Parse(data[2]),
+                        int.Parse(data[3])));
+            }
+        }
     }
 }

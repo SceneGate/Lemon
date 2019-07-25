@@ -1,0 +1,41 @@
+{
+    "name": "system",
+    "format_type": "Yarhl.FileSystem.NodeContainerFormat",
+    "stream_offset": -1,
+    "stream_length": -1,
+    "check_children": true,
+    "children": [
+        {
+            "name": ".code",
+            "format_type": "Yarhl.IO.BinaryFormat",
+            "stream_offset": 19968,
+            "stream_length": 980732,
+            "check_children": true,
+            "children": []
+        },
+        {
+            "name": "banner",
+            "format_type": "Yarhl.IO.BinaryFormat",
+            "stream_offset": 1000960,
+            "stream_length": 165064,
+            "check_children": true,
+            "children": []
+        },
+        {
+            "name": "icon",
+            "format_type": "Yarhl.IO.BinaryFormat",
+            "stream_offset": 1166336,
+            "stream_length": 14016,
+            "check_children": true,
+            "children": []
+        },
+        {
+            "name": "logo",
+            "format_type": "Yarhl.IO.BinaryFormat",
+            "stream_offset": 1180672,
+            "stream_length": 8192,
+            "check_children": true,
+            "children": []
+        }
+    ]
+}
