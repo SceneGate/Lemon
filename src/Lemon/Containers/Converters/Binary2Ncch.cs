@@ -17,7 +17,6 @@
 namespace Lemon.Containers.Converters
 {
     using System;
-    using System.Linq;
     using Lemon.Containers.Formats;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;

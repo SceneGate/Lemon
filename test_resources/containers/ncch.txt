@@ -1,5 +1,5 @@
 # Manually created and committed
-fake_ncch.json,fake.ncsd,16384,1024
+fake_ncch.json,fake.ncsd,16384,2048
 
 # Optionals not committed
 aofm_program.json,aofm.3ds,16384,186109952
