@@ -1,7 +1,7 @@
 # Manually created and committed
-fake.ncsd,fake_ncsd.json
+fake.ncsd,fake_ncsd.yml
 
 # Optionals not committed
-aofm.3ds,aofm.json
-update.csu,update.json
-nand.bin,nand.json
+aofm.3ds,aofm.yml
+update.csu,update.yml
+nand.bin,nand.yml

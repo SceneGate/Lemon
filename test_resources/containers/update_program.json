@@ -1,6 +1,0 @@
-{
-    "signature_length": 256,
-    "regions_offset": [2560, 10752, 421888],
-    "regions_size": [8192, 410624, 147668992],
-    "available_regions": ["logo.bin", "system", "rom"]
-}

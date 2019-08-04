@@ -1,5 +1,5 @@
 # Manually created and committed
-fake_exefs.json,fake.ncsd,16896,1024
+fake_exefs.yml,fake.ncsd,16896,1024
 
 # Optionals not committed
-aofm_exefs.json,aofm.3ds,19456,1169408
+aofm_exefs.yml,aofm.3ds,19456,1169408

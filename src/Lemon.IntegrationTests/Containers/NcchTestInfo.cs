@@ -16,10 +16,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.IntegrationTests.Containers
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
-
-    [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
     public class NcchTestInfo
     {
         public int SignatureLength {

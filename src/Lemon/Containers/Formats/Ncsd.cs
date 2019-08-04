@@ -19,8 +19,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.Containers.Formats
 {
-    using System;
-    using Yarhl.FileFormat;
     using Yarhl.FileSystem;
 
     /// <summary>

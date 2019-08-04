@@ -1,0 +1,12 @@
+name: rom
+format_type: Yarhl.FileSystem.NodeContainerFormat
+check_children: true
+children:
+  - name: gkk
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    check_children: false
+    children:
+  - name: lv5
+    format_type: Yarhl.FileSystem.NodeContainerFormat
+    check_children: false
+    children:

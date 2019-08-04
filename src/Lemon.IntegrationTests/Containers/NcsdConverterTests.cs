@@ -16,11 +16,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.IntegrationTests.Containers
 {
-    using System;
     using System.IO;
     using Lemon.Containers.Formats;
-    using Newtonsoft.Json;
     using NUnit.Framework;
+    using YamlDotNet.Serialization;
+    using YamlDotNet.Serialization.NamingConventions;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
@@ -28,16 +28,16 @@ namespace Lemon.IntegrationTests.Containers
     public class NcsdConverterTests
     {
         readonly string ncsdPath;
-        readonly string jsonPath;
+        readonly string yamlPath;
 
         Node actualNode;
         Ncsd actual;
         NcsdTestInfo expected;
 
-        public NcsdConverterTests(string ncsdPath, string jsonPath)
+        public NcsdConverterTests(string ncsdPath, string yamlPath)
         {
             this.ncsdPath = ncsdPath;
-            this.jsonPath = jsonPath;
+            this.yamlPath = yamlPath;
         }
 
         [OneTimeSetUp]
@@ -45,15 +45,18 @@ namespace Lemon.IntegrationTests.Containers
         {
             if (!File.Exists(ncsdPath))
                 Assert.Ignore($"NCSD file doesn't exist: {ncsdPath}");
-            if (!File.Exists(jsonPath))
-                Assert.Ignore($"JSON file doesn't exist: {jsonPath}");
+            if (!File.Exists(yamlPath))
+                Assert.Ignore($"YAML file doesn't exist: {yamlPath}");
 
             actualNode = NodeFactory.FromFile(ncsdPath);
             Assert.That(() => actualNode.TransformTo<Ncsd>(), Throws.Nothing);
             actual = actualNode.GetFormatAs<Ncsd>();
 
-            string json = File.ReadAllText(jsonPath);
-            expected = JsonConvert.DeserializeObject<NcsdTestInfo>(json);
+            string yaml = File.ReadAllText(yamlPath);
+            expected = new DeserializerBuilder()
+                .WithNamingConvention(new UnderscoredNamingConvention())
+                .Build()
+                .Deserialize<NcsdTestInfo>(yaml);
         }
 
         [OneTimeTearDown]

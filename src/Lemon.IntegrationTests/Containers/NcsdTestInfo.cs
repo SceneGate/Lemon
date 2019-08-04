@@ -17,10 +17,7 @@
 namespace Lemon.IntegrationTests.Containers
 {
     using Lemon.Containers.Formats;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
 
-    [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
     public class NcsdTestInfo
     {
         public int SignatureLength {

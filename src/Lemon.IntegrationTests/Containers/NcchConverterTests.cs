@@ -16,18 +16,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.IntegrationTests.Containers
 {
-    using System;
     using System.IO;
     using Lemon.Containers.Formats;
-    using Newtonsoft.Json;
     using NUnit.Framework;
+    using YamlDotNet.Serialization;
+    using YamlDotNet.Serialization.NamingConventions;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
     [TestFixtureSource(typeof(TestData), nameof(TestData.NcchParams))]
     public class NcchConverterTests
     {
-        readonly string jsonPath;
+        readonly string yamlPath;
         readonly string binaryPath;
         readonly int offset;
         readonly int size;
@@ -36,9 +36,9 @@ namespace Lemon.IntegrationTests.Containers
         Ncch actual;
         NcchTestInfo expected;
 
-        public NcchConverterTests(string jsonPath, string binaryPath, int offset, int size)
+        public NcchConverterTests(string yamlPath, string binaryPath, int offset, int size)
         {
-            this.jsonPath = jsonPath;
+            this.yamlPath = yamlPath;
             this.binaryPath = binaryPath;
             this.offset = offset;
             this.size = size;
@@ -49,8 +49,8 @@ namespace Lemon.IntegrationTests.Containers
         {
             if (!File.Exists(binaryPath))
                 Assert.Ignore($"Binary file doesn't exist: {binaryPath}");
-            if (!File.Exists(jsonPath))
-                Assert.Ignore($"JSON file doesn't exist: {jsonPath}");
+            if (!File.Exists(yamlPath))
+                Assert.Ignore($"YAML file doesn't exist: {yamlPath}");
 
             using (var stream = new DataStream(binaryPath, FileOpenMode.Read, offset, size)) {
                 actualNode = new Node("actual", new BinaryFormat(stream));
@@ -59,8 +59,11 @@ namespace Lemon.IntegrationTests.Containers
             Assert.That(() => actualNode.TransformTo<Ncch>(), Throws.Nothing);
             actual = actualNode.GetFormatAs<Ncch>();
 
-            string json = File.ReadAllText(jsonPath);
-            expected = JsonConvert.DeserializeObject<NcchTestInfo>(json);
+            string yaml = File.ReadAllText(yamlPath);
+            expected = new DeserializerBuilder()
+                .WithNamingConvention(new UnderscoredNamingConvention())
+                .Build()
+                .Deserialize<NcchTestInfo>(yaml);
         }
 
         [OneTimeTearDown]
