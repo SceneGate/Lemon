@@ -1,5 +1,5 @@
 # Manually created and committed
-fake_ncch.yml,fake.ncsd,16384,2048
+fake_ncch.yml,fake.ncsd,16384,3072
 
 # Optionals not committed
 aofm_program.yml,aofm.3ds,16384,186109952

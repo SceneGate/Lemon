@@ -29,11 +29,13 @@ namespace Lemon.Containers.Converters
     /// Converter for Binary streams into a file system following the
     /// Executable File System tree format.
     /// </summary>
-    public class BinaryExeFs2NodeContainer : IConverter<BinaryFormat, NodeContainerFormat>
+    public class BinaryExeFs2NodeContainer :
+        IConverter<BinaryFormat, NodeContainerFormat>,
+        IConverter<NodeContainerFormat, BinaryFormat>
     {
         const int NumberFiles = 10;
         const int HeaderSize = 0x200;
-        const int ReservedSize = 0x20;
+        const int Sha256Size = 0x20;
 
         static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
@@ -59,13 +61,9 @@ namespace Lemon.Containers.Converters
                 }
             }
 
-            byte[] reserved = reader.ReadBytes(ReservedSize);
-            if (reserved.Any(x => x != 0x00)) {
-                Logger.Warn("Expected 'Reserved' to be empty but it has content.");
-            }
+            reader.ReadPadding(0x40);
 
             // Validate the hashes
-            const int Sha256Size = 0x20;
             int totalHashSize = NumberFiles * Sha256Size;
             for (int i = 0; i < container.Root.Children.Count; i++) {
                 // Hash are stored in reverse order, from end to beginning
@@ -83,6 +81,58 @@ namespace Lemon.Containers.Converters
             }
 
             return container;
+        }
+
+        /// <summary>
+        /// Converts a container of nodes into a binary of format
+        /// Executable file system.
+        /// </summary>
+        /// <param name="source">Container of nodes.</param>
+        /// <returns>The new binary container.</returns>
+        public BinaryFormat Convert(NodeContainerFormat source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            var binary = new BinaryFormat();
+            var writer = new DataWriter(binary.Stream) {
+                DefaultEncoding = Encoding.ASCII,
+            };
+
+            // Generate empty header so we can write content at the same time
+            writer.WriteTimes(0x00, HeaderSize);
+
+            // Write table with files
+            binary.Stream.Position = 0;
+            foreach (var child in source.Root.Children) {
+                writer.Write(child.Name, 8);
+                writer.Write((uint)(binary.Stream.Length - HeaderSize));
+                writer.Write((uint)child.Stream.Length);
+
+                binary.Stream.RunInPosition(
+                    () => {
+                        child.Stream.WriteTo(binary.Stream);
+                        writer.WritePadding(0x00, 0x200);
+                    },
+                    0,
+                    SeekMode.End);
+            }
+
+            binary.Stream.Position = NumberFiles * 0x10;
+            writer.WritePadding(0x00, 0x40);
+
+            int totalHashSize = NumberFiles * Sha256Size;
+            for (int i = 0; i < source.Root.Children.Count; i++) {
+                byte[] hash = ComputeHash(source.Root.Children[i].Stream);
+
+                // Hash are stored in reverse order, from end to beginning
+                binary.Stream.RunInPosition(
+                    () => writer.Write(hash),
+                    totalHashSize - (Sha256Size * (i + 1)),
+                    SeekMode.Current);
+            }
+
+            return binary;
         }
 
         static Node GetNodeFromHeader(DataReader reader)
@@ -104,6 +154,7 @@ namespace Lemon.Containers.Converters
             byte[] hash;
             using (SHA256 sha = SHA256.Create()) {
                 // Read the file in blocks of 64 KB (small enough for the SOH).
+                stream.Position = 0;
                 int offset = 0;
                 byte[] buffer = new byte[1024 * 64];
                 while (offset + buffer.Length < stream.Length) {

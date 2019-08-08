@@ -11,14 +11,14 @@ children:
 
   - name: banner
     format_type: Yarhl.IO.BinaryFormat
-    stream_offset: 17440
+    stream_offset: 17920
     stream_length: 64
     check_children: true
     children: []
 
   - name: randomm
     format_type: Yarhl.IO.BinaryFormat
-    stream_offset: 17504
+    stream_offset: 18432
     stream_length: 80
     check_children: true
     children: []

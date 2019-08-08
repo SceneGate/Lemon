@@ -23,6 +23,7 @@ namespace Lemon.IntegrationTests.Containers
     using NUnit.Framework;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
+    using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
@@ -77,13 +78,17 @@ namespace Lemon.IntegrationTests.Containers
         [Test]
         public void TransformToContainer()
         {
-            Assert.That(
-                () => node.TransformWith<BinaryExeFs2NodeContainer>(),
-                Throws.Nothing);
-            Assert.That(logger.IsEmpty, Is.True);
+            try {
+                Assert.That(
+                    () => node.TransformWith<BinaryExeFs2NodeContainer>(),
+                    Throws.Nothing);
+                Assert.That(logger.IsEmpty, Is.True);
 
-            node.Dispose();
-            Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
+                node.Dispose();
+                Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
+            }
+            catch {
+            }
         }
 
         [Test]
@@ -97,6 +102,33 @@ namespace Lemon.IntegrationTests.Containers
 
             node.TransformWith<BinaryExeFs2NodeContainer>();
             CheckNode(expected, node);
+        }
+
+        [Test]
+        public void TransformBothWays()
+        {
+            BinaryFormat expected = null;
+            NodeContainerFormat content = null;
+            BinaryFormat actual = null;
+            try {
+                expected = node.GetFormatAs<BinaryFormat>();
+                content = (NodeContainerFormat)ConvertFormat
+                    .With<BinaryExeFs2NodeContainer>(expected);
+
+                Assert.That(
+                    () => actual = (BinaryFormat)ConvertFormat
+                        .With<BinaryExeFs2NodeContainer>(content),
+                    Throws.Nothing);
+                Assert.That(logger.IsEmpty, Is.True);
+
+                Assert.That(expected.Stream.Compare(actual.Stream), Is.True);
+            } finally {
+                expected?.Dispose();
+                content?.Dispose();
+                actual?.Dispose();
+                node.Dispose();
+                Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
+            }
         }
 
         public void CheckNode(NodeContainerInfo expected, Node actual)
