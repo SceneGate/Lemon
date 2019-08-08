@@ -4,7 +4,7 @@ language: csharp
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: bionic
       mono: latest
       dotnet: 2.2
     - os: osx
@@ -16,10 +16,6 @@ before_install:
 - |
   if [[ $TRAVIS_OS_NAME == "osx" ]]; then
     brew install git-lfs
-  else
-    sudo apt-get clean
-    sudo apt-get update
-    sudo apt-get install dpkg
   fi
 
 before_script:
