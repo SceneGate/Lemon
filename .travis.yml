@@ -6,11 +6,11 @@ matrix:
     - os: linux
       dist: trusty
       mono: latest
-      dotnet: 2.1
+      dotnet: 2.2
     - os: osx
       osx_image: xcode10
       mono: latest
-      dotnet: 2.1.500
+      dotnet: 2.2.401
 
 before_install:
 - |
