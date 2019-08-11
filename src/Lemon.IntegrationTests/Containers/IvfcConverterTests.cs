@@ -14,8 +14,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.IntegrationTests.Containers
 {
+    using System;
     using System.IO;
     using Lemon.Containers.Converters;
+    using Lemon.Logging;
     using NUnit.Framework;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
@@ -30,8 +32,8 @@ namespace Lemon.IntegrationTests.Containers
         readonly int offset;
         readonly int size;
 
-        Node actual;
-        NodeContainerInfo expected;
+        CaptureLogger logger;
+        Node node;
 
         public IvfcConverterTests(string yamlPath, string binaryPath, int offset, int size)
         {
@@ -49,32 +51,54 @@ namespace Lemon.IntegrationTests.Containers
             if (!File.Exists(yamlPath))
                 Assert.Ignore($"YAML file doesn't exist: {yamlPath}");
 
-            using (var stream = new DataStream(binaryPath, FileOpenMode.Read, offset, size)) {
-                actual = new Node("rom", new BinaryFormat(stream));
-            }
-
-            Assert.That(
-                () => actual.TransformWith<BinaryIvfc2NodeContainer>(),
-                Throws.Nothing);
-
-            string yaml = File.ReadAllText(yamlPath);
-            expected = new DeserializerBuilder()
-                .WithNamingConvention(new UnderscoredNamingConvention())
-                .Build()
-                .Deserialize<NodeContainerInfo>(yaml);
+            logger = new CaptureLogger();
+            LogProvider.SetCurrentLogProvider(logger);
         }
 
-        [OneTimeTearDown]
+        [SetUp]
+        public void SetUp()
+        {
+            logger.Clear();
+
+            Console.WriteLine(Path.GetFileName(binaryPath));
+            using (var stream = new DataStream(binaryPath, FileOpenMode.Read, offset, size)) {
+                node = new Node("rom", new BinaryFormat(stream));
+            }
+        }
+
+        [TearDown]
         public void TearDownFixture()
         {
-            actual?.Dispose();
-            Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
+            node?.Dispose();
+        }
+
+        [Test]
+        public void TransformToContainer()
+        {
+            try {
+                Assert.That(
+                    () => node.TransformWith<BinaryIvfc2NodeContainer>(),
+                    Throws.Nothing);
+                Assert.That(logger.IsEmpty, Is.True);
+
+                node.Dispose();
+                Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
+            }
+            catch {
+            }
         }
 
         [Test]
         public void ValidateNodes()
         {
-            CheckNode(expected, actual);
+            string yaml = File.ReadAllText(yamlPath);
+            NodeContainerInfo expected = new DeserializerBuilder()
+                .WithNamingConvention(new UnderscoredNamingConvention())
+                .Build()
+                .Deserialize<NodeContainerInfo>(yaml);
+
+            node.TransformWith<BinaryIvfc2NodeContainer>();
+            CheckNode(expected, node);
         }
 
         public void CheckNode(NodeContainerInfo expected, Node actual)
