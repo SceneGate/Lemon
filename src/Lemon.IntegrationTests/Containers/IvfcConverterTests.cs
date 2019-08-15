@@ -21,6 +21,7 @@ namespace Lemon.IntegrationTests.Containers
     using NUnit.Framework;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
+    using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
@@ -99,6 +100,34 @@ namespace Lemon.IntegrationTests.Containers
 
             node.TransformWith<BinaryIvfc2NodeContainer>();
             CheckNode(expected, node);
+        }
+
+        [Test]
+        public void TransformBothWays()
+        {
+            BinaryFormat expected = null;
+            NodeContainerFormat content = null;
+            BinaryFormat actual = null;
+            try {
+                expected = node.GetFormatAs<BinaryFormat>();
+                content = (NodeContainerFormat)ConvertFormat
+                    .With<BinaryIvfc2NodeContainer>(expected);
+
+                Assert.That(
+                    () => actual = (BinaryFormat)ConvertFormat
+                        .With<NodeContainer2BinaryIvfc>(content),
+                    Throws.Nothing);
+                Assert.That(logger.IsEmpty, Is.True);
+
+                actual.Stream.WriteTo(@"C:\users\benit\test.bin");
+                Assert.That(expected.Stream.Compare(actual.Stream), Is.True);
+            } finally {
+                expected?.Dispose();
+                content?.Dispose();
+                actual?.Dispose();
+                node.Dispose();
+                Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
+            }
         }
 
         public void CheckNode(NodeContainerInfo expected, Node actual)

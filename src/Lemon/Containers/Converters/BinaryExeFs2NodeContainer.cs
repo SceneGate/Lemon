@@ -61,7 +61,7 @@ namespace Lemon.Containers.Converters
                 }
             }
 
-            reader.ReadPadding(0x40);
+            reader.SkipPadding(0x40);
 
             // Validate the hashes
             int totalHashSize = NumberFiles * Sha256Size;

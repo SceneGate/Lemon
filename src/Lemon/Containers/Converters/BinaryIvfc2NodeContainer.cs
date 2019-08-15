@@ -107,7 +107,7 @@ namespace Lemon.Containers.Converters
                 fileDataOffset = levelReader.ReadUInt32();
 
                 // Start processing directories and from there we will
-                // get their files too.
+                // get their files too. First entry is root.
                 level3.Position = dirInfoOffset;
                 ReadDirectoryInfo(root.Root);
             }
