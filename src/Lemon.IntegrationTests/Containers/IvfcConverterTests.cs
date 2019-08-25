@@ -62,9 +62,8 @@ namespace Lemon.IntegrationTests.Containers
             logger.Clear();
 
             Console.WriteLine(Path.GetFileName(binaryPath));
-            using (var stream = new DataStream(binaryPath, FileOpenMode.Read, offset, size)) {
-                node = new Node("rom", new BinaryFormat(stream));
-            }
+            var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
+            node = new Node("rom", new BinaryFormat(stream));
         }
 
         [TearDown]
@@ -119,7 +118,6 @@ namespace Lemon.IntegrationTests.Containers
                     Throws.Nothing);
                 Assert.That(logger.IsEmpty, Is.True);
 
-                actual.Stream.WriteTo(@"C:\users\benit\test.bin");
                 Assert.That(expected.Stream.Compare(actual.Stream), Is.True);
             } finally {
                 expected?.Dispose();

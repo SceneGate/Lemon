@@ -64,9 +64,8 @@ namespace Lemon.IntegrationTests.Containers
             logger.Clear();
 
             Console.WriteLine(Path.GetFileName(binaryPath));
-            using (var stream = new DataStream(binaryPath, FileOpenMode.Read, offset, size)) {
-                node = new Node("system", new BinaryFormat(stream));
-            }
+            var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
+            node = new Node("system", new BinaryFormat(stream));
         }
 
         [TearDown]

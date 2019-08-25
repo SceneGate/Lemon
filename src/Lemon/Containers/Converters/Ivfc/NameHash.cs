@@ -45,7 +45,7 @@ namespace Lemon.Containers.Converters.Ivfc
             uint hash = seed ^ 123456789;
             for (int i = 0; i < name.Length; i += 2) {
                 hash = (hash >> 5) | (hash << 27);
-                hash ^= (ushort)((name[i]) | (name[i + 1] << 8));
+                hash ^= (ushort)(name[i] | (name[i + 1] << 8));
             }
 
             return hash;

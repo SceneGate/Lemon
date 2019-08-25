@@ -12,16 +12,15 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Lemon.Logging;
-using Yarhl.FileSystem;
-using Yarhl.IO;
-
 namespace Lemon.Containers.Converters.Ivfc
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using Lemon.Logging;
+    using Yarhl.FileSystem;
+    using Yarhl.IO;
+
     internal class FileSystemWriter
     {
         const int HeaderSize = 0x28;
@@ -60,6 +59,37 @@ namespace Lemon.Containers.Converters.Ivfc
                 return dirHashTable.Size + dirInfoTable.Size
                     + fileHashTable.Size + fileInfoTable.Size;
             }
+        }
+
+        public void Write(DataStream stream)
+        {
+            dirHashTable.ResetPosition();
+            dirInfoTable.ResetPosition();
+            fileHashTable.ResetPosition();
+            fileInfoTable.ResetPosition();
+            fileData.ResetPosition();
+            files = new List<Node>();
+
+            streamWriter = new DataWriter(stream);
+            using (var metadataStream = new DataStream())
+            {
+                writer = new DataWriter(metadataStream);
+                reader = new DataReader(metadataStream);
+
+                WriteHeader();
+
+                // Prefill so we can jump between sections
+                // Also, unused fields must be at 0xFF
+                writer.WriteTimes(0xFF, MetadataSize);
+
+                WriteDirectoryInfo(root, false, true, (uint)dirInfoTable.Offset);
+                WriteNode(root, (uint)dirInfoTable.Offset);
+
+                metadataStream.WriteTo(stream);
+                streamWriter.WritePadding(0x00, 0x10);
+            }
+
+            WriteFiles();
         }
 
         void Analyze()
@@ -110,37 +140,6 @@ namespace Lemon.Containers.Converters.Ivfc
                 Offset = (fileInfoTable.Offset + fileInfoTable.Size).Pad(0x10),
                 Size = info.FileDataLength,
             };
-        }
-
-        public void Write(DataStream stream)
-        {
-            dirHashTable.ResetPosition();
-            dirInfoTable.ResetPosition();
-            fileHashTable.ResetPosition();
-            fileInfoTable.ResetPosition();
-            fileData.ResetPosition();
-            files = new List<Node>();
-
-            streamWriter = new DataWriter(stream);
-            using (var metadataStream = new DataStream())
-            {
-                writer = new DataWriter(metadataStream);
-                reader = new DataReader(metadataStream);
-
-                WriteHeader();
-
-                // Prefill so we can jump between sections
-                // Also, unused fields must be at 0xFF
-                writer.WriteTimes(0xFF, MetadataSize);
-
-                WriteDirectoryInfo(root, false, true, (uint)dirInfoTable.Offset);
-                WriteNode(root, (uint)dirInfoTable.Offset);
-
-                metadataStream.WriteTo(stream);
-                streamWriter.WritePadding(0x00, 0x10);
-            }
-
-            WriteFiles();
         }
 
         void WriteFiles()

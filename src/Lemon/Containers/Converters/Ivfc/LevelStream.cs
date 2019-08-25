@@ -17,22 +17,29 @@ namespace Lemon.Containers.Converters.Ivfc
     using System;
     using System.Security.Cryptography;
     using Yarhl.IO;
+    using Yarhl.IO.StreamFormat;
 
-    internal class LevelStream : DataStream
+    internal class LevelStream : IStream
     {
+        readonly IStream stream;
+        readonly bool managedStream;
         SHA256 sha;
 
         public LevelStream(int blockSize)
-            : base()
         {
             BlockSize = blockSize;
+            stream = new RecyclableMemoryStream();
+            managedStream = true;
+
             sha = SHA256.Create();
         }
 
-        public LevelStream(DataStream stream, long offset, long size, int blockSize)
-            : base(stream, offset, size)
+        public LevelStream(int blockSize, IStream stream)
         {
             BlockSize = blockSize;
+            this.stream = stream;
+            managedStream = false;
+
             sha = SHA256.Create();
         }
 
@@ -40,33 +47,45 @@ namespace Lemon.Containers.Converters.Ivfc
 
         public int BlockSize { get; }
 
-        public override byte ReadByte()
+        public long Position { get; set; }
+
+        public long Length => stream.Length;
+
+        public bool Disposed { get; private set; }
+
+        public byte ReadByte()
         {
-            return base.ReadByte();
+            stream.Position = Position;
+            Position++;
+            return stream.ReadByte();
         }
 
-        public override int Read(byte[] buffer, int offset, int count)
+        public int Read(byte[] buffer, int offset, int count)
         {
-            return base.Read(buffer, offset, count);
+            stream.Position = Position;
+            Position += count;
+            return stream.Read(buffer, offset, count);
         }
 
-        public override void WriteByte(byte val)
+        public void WriteByte(byte val)
         {
             WriteAndUpdateHash(new[] { val }, 0, 1);
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
+        public void Write(byte[] buffer, int offset, int count)
         {
             WriteAndUpdateHash(buffer, offset, count);
         }
 
-        public void PadBlock()
+        public void SetLength(long length)
         {
-            int posInBlock = (int)(Position % BlockSize);
-            int bytesToWrite = BlockSize - posInBlock;
-            byte[] padding = new byte[bytesToWrite];
+            stream.SetLength(length);
+        }
 
-            WriteAndUpdateHash(padding, 0, bytesToWrite);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         void WriteAndUpdateHash(byte[] data, int offset, int count)
@@ -89,7 +108,7 @@ namespace Lemon.Containers.Converters.Ivfc
                 if (posInBlock == 0 && bytesToWrite > 0)
                 {
                     sha.TransformBlock(data, offset, 1, data, offset);
-                    base.Write(data, offset, 1);
+                    WriteStream(data, offset, 1);
                     offset += 1;
                     count -= 1;
                     bytesToWrite -= 1;
@@ -98,7 +117,7 @@ namespace Lemon.Containers.Converters.Ivfc
                 // Send bytes to SHA and to the stream so we update our
                 // position too.
                 sha.TransformFinalBlock(data, offset, bytesToWrite);
-                base.Write(data, offset, bytesToWrite);
+                WriteStream(data, offset, bytesToWrite);
 
                 // Trigger event.
                 var eventArgs = new BlockWrittenEventArgs(sha.Hash);
@@ -113,7 +132,26 @@ namespace Lemon.Containers.Converters.Ivfc
 
             if (count > 0) {
                 sha.TransformBlock(data, offset, count, data, offset);
-                base.Write(data, offset, count);
+                WriteStream(data, offset, count);
+            }
+        }
+
+        void WriteStream(byte[] data, int index, int count)
+        {
+            stream.Position = Position;
+            Position += count;
+            stream.Write(data, index, count);
+        }
+
+        void Dispose(bool freeManaged)
+        {
+            if (Disposed) {
+                return;
+            }
+
+            Disposed = true;
+            if (freeManaged && managedStream) {
+                stream.Dispose();
             }
         }
     }

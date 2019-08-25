@@ -52,9 +52,8 @@ namespace Lemon.IntegrationTests.Containers
             if (!File.Exists(yamlPath))
                 Assert.Ignore($"YAML file doesn't exist: {yamlPath}");
 
-            using (var stream = new DataStream(binaryPath, FileOpenMode.Read, offset, size)) {
-                actualNode = new Node("actual", new BinaryFormat(stream));
-            }
+            var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
+            actualNode = new Node("actual", new BinaryFormat(stream));
 
             Assert.That(() => actualNode.TransformTo<Ncch>(), Throws.Nothing);
             actual = actualNode.GetFormatAs<Ncch>();
