@@ -19,12 +19,20 @@ namespace Lemon.Containers.Converters.Ivfc
     using Yarhl.IO;
     using Yarhl.IO.StreamFormat;
 
+    /// <summary>
+    /// IVFC level stream.
+    /// </summary>
     internal class LevelStream : IStream
     {
         readonly IStream stream;
         readonly bool managedStream;
         SHA256 sha;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LevelStream"/> class
+        /// and use a stream in-memory.
+        /// </summary>
+        /// <param name="blockSize">Block size for padding and hash.</param>
         public LevelStream(int blockSize)
         {
             BlockSize = blockSize;
@@ -34,6 +42,11 @@ namespace Lemon.Containers.Converters.Ivfc
             sha = SHA256.Create();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LevelStream" /> class.
+         /// </summary>
+        /// <param name="blockSize">Block size for padding and hash.</param>
+        /// <param name="stream">The underlying stream.</param>
         public LevelStream(int blockSize, IStream stream)
         {
             BlockSize = blockSize;
@@ -43,16 +56,48 @@ namespace Lemon.Containers.Converters.Ivfc
             sha = SHA256.Create();
         }
 
+        /// <summary>
+        /// Raises when a new block of data is generated.
+        /// </summary>
         public event EventHandler<BlockWrittenEventArgs> BlockWritten;
 
+        /// <summary>
+        /// Gets the block size for padding and hash.
+        /// </summary>
         public int BlockSize { get; }
 
+        /// <summary>
+        /// Gets or sets the position from the start of this stream.
+        /// </summary>
         public long Position { get; set; }
 
+        /// <summary>
+        /// Gets the length of this stream.
+        /// </summary>
         public long Length => stream.Length;
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="LevelStream" />
+        /// has been dispsosed.
+        /// </summary>
         public bool Disposed { get; private set; }
 
+        /// <summary>
+        /// Sets the length of the stream.
+        /// </summary>
+        /// <param name="length">The new length of the stream.</param>
+        /// <remarks>
+        /// Some streams may not implement or support changing the length.
+        /// </remarks>
+        public void SetLength(long length)
+        {
+            stream.SetLength(length);
+        }
+
+        /// <summary>
+        /// Reads the next byte.
+        /// </summary>
+        /// <returns>The next byte.</returns>
         public byte ReadByte()
         {
             stream.Position = Position;
@@ -60,28 +105,43 @@ namespace Lemon.Containers.Converters.Ivfc
             return stream.ReadByte();
         }
 
-        public int Read(byte[] buffer, int offset, int count)
+        /// <summary>
+        /// Reads from the stream to the buffer.
+        /// </summary>
+        /// <returns>The number of bytes read.</returns>
+        /// <param name="buffer">Buffer to copy data.</param>
+        /// <param name="index">Index to start copying in buffer.</param>
+        /// <param name="count">Number of bytes to read.</param>
+        public int Read(byte[] buffer, int index, int count)
         {
             stream.Position = Position;
             Position += count;
-            return stream.Read(buffer, offset, count);
+            return stream.Read(buffer, index, count);
         }
 
-        public void WriteByte(byte val)
+        /// <summary>
+        /// Writes a byte.
+        /// </summary>
+        /// <param name="data">Byte value.</param>
+        public void WriteByte(byte data)
         {
-            WriteAndUpdateHash(new[] { val }, 0, 1);
+            WriteAndUpdateHash(new[] { data }, 0, 1);
         }
 
-        public void Write(byte[] buffer, int offset, int count)
+        /// <summary>
+        /// Writes the a portion of the buffer to the stream.
+        /// </summary>
+        /// <param name="buffer">Buffer to write.</param>
+        /// <param name="index">Index in the buffer.</param>
+        /// <param name="count">Bytes to write.</param>
+        public void Write(byte[] buffer, int index, int count)
         {
-            WriteAndUpdateHash(buffer, offset, count);
+            WriteAndUpdateHash(buffer, index, count);
         }
 
-        public void SetLength(long length)
-        {
-            stream.SetLength(length);
-        }
-
+        /// <summary>
+        /// Releases all resource used by the <see cref="LevelStream"/> object.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

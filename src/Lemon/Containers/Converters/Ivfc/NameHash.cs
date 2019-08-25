@@ -14,8 +14,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.Containers.Converters.Ivfc
 {
+    /// <summary>
+    /// Generate hashes for name and directory lookup.
+    /// </summary>
     internal static class NameHash
     {
+        /// <summary>
+        /// Calculates the size of tokens for the hash table.
+        /// </summary>
+        /// <param name="numEntries">The number of entries to hash.</param>
+        /// <returns>The number of tokens of the hash table.</returns>
         public static int CalculateTableLength(int numEntries)
         {
             if (numEntries < 3) {
@@ -40,6 +48,12 @@ namespace Lemon.Containers.Converters.Ivfc
             return count;
         }
 
+        /// <summary>
+        /// Calculates the hash for an entry.
+        /// </summary>
+        /// <param name="seed">The seed value.</param>
+        /// <param name="name">The name of the entry.</param>
+        /// <returns>The calculated hash.</returns>
         public static uint CalculateHash(uint seed, byte[] name)
         {
             uint hash = seed ^ 123456789;

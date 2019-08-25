@@ -14,15 +14,24 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace Lemon.Containers.Converters.Ivfc
 {
-    using System.Collections.Generic;
-
+    /// <summary>
+    /// Event argument for written blocks of data.
+    /// </summary>
     internal class BlockWrittenEventArgs
     {
+        /// <summary>
+        /// Initializes a new instance of the
+        /// <see cref="BlockWrittenEventArgs" /> class.
+        /// </summary>
+        /// <param name="hash">The hash to pass in the argument.</param>
         public BlockWrittenEventArgs(byte[] hash)
         {
             Hash = hash;
         }
 
+        /// <summary>
+        /// Gets the hash of the written block.
+        /// </summary>
         public byte[] Hash { get; }
     }
 }

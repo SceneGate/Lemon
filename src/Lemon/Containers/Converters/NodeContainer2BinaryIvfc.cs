@@ -36,8 +36,7 @@ namespace Lemon.Containers.Converters
     /// |--* Files info
     /// |--* File data
     /// * Level 1
-    /// * Level 2
-    ///
+    /// * Level 2.
     /// <para>Level 0, 1 and 2 only contain SHA-256 hashes of the upper layer.
     /// Level 3 contains the file system metadata and file data.</para>
     /// </remarks>

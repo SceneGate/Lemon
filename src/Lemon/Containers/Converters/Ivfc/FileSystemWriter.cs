@@ -21,6 +21,9 @@ namespace Lemon.Containers.Converters.Ivfc
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
+    /// <summary>
+    /// IVFC file system writer.
+    /// </summary>
     internal class FileSystemWriter
     {
         const int HeaderSize = 0x28;
@@ -44,6 +47,11 @@ namespace Lemon.Containers.Converters.Ivfc
         DataWriter writer;
         DataReader reader;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileSystemWriter" />
+        /// class.
+        /// </summary>
+        /// <param name="root">The root node with the file system.</param>
         public FileSystemWriter(Node root)
         {
             this.root = root;
@@ -52,8 +60,14 @@ namespace Lemon.Containers.Converters.Ivfc
             PrecalculateSize();
         }
 
+        /// <summary>
+        /// Gets the total size of the file system.
+        /// </summary>
         public long Size => fileData.Offset + fileData.Size;
 
+        /// <summary>
+        /// Gets the size of the metadata.
+        /// </summary>
         public long MetadataSize {
             get {
                 return dirHashTable.Size + dirInfoTable.Size
@@ -61,6 +75,10 @@ namespace Lemon.Containers.Converters.Ivfc
             }
         }
 
+        /// <summary>
+        /// Writes the file system into a stream.
+        /// </summary>
+        /// <param name="stream">The stream to write the file system.</param>
         public void Write(DataStream stream)
         {
             dirHashTable.ResetPosition();
