@@ -216,7 +216,7 @@ namespace Lemon.Containers.Converters.Ivfc
 
             // Calculate the hash from the name and the parent offset.
             // The root node doesn't have name.
-            string dirName = dir.Parent == null ? string.Empty : dir.Name;
+            string dirName = dir == root ? string.Empty : dir.Name;
             byte[] name = NameEncoding.GetBytes(dirName);
             uint hash = NameHash.CalculateHash(relativeParent, name);
             int hashIdx = (int)(hash % info.DirectoryHashes);

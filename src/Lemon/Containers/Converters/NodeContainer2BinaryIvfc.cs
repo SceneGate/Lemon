@@ -86,13 +86,14 @@ namespace Lemon.Containers.Converters
 
             var binary = (stream != null) ? new BinaryFormat(stream) : new BinaryFormat();
             var writer = new DataWriter(binary.Stream);
-            var fsWriter = new FileSystemWriter(source.Root);
 
             // Analyze the file system to pre-calculate the sizes.
             // As said, Level 3 contains the whole file system,
             // the other level just contain SHA-256 hashes of every block
             // from the lower layer. So we get the number of blocks
             // (number of hashes) and multiple by the hash size.
+            var fsWriter = new FileSystemWriter(source.Root);
+
             const int LevelHashSize = 0x20; // SHA-256 size
             long[] levelSizes = new long[4];
             levelSizes[3] = fsWriter.Size;

@@ -128,6 +128,31 @@ namespace Lemon.IntegrationTests.Containers
             }
         }
 
+        [Test]
+        public void TransformBotnWaysInChildren()
+        {
+            DataStream expected = null;
+            DataStream actual = null;
+            try {
+                expected = new DataStream(node.Stream, 0, node.Stream.Length);
+
+                Node parent = new Node("program");
+                parent.Add(node);
+
+                actual = parent.Children["rom"]
+                    .TransformWith<BinaryIvfc2NodeContainer>()
+                    .TransformWith<NodeContainer2BinaryIvfc>()
+                    .Stream;
+
+                Assert.That(logger.IsEmpty, Is.True);
+                Assert.That(expected.Compare(actual), Is.True);
+            } finally {
+                expected.Dispose();
+                node.Dispose();
+                Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
+            }
+        }
+
         public void CheckNode(NodeContainerInfo expected, Node actual)
         {
             Assert.That(
