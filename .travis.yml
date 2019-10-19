@@ -7,16 +7,6 @@ matrix:
       dist: bionic
       mono: latest
       dotnet: 2.2
-    - os: osx
-      osx_image: xcode10
-      mono: latest
-      dotnet: 2.2.401
-
-before_install:
-- |
-  if [[ $TRAVIS_OS_NAME == "osx" ]]; then
-    brew install git-lfs
-  fi
 
 before_script:
 - git lfs install
