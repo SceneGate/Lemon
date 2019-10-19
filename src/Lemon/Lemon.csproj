@@ -12,7 +12,7 @@
     <Company>SceneGate</Company>
     <Copyright>Copyright (c) 2019 SceneGate</Copyright>
     <RepositoryUrl>https://github.com/SceneGate/Lemon/</RepositoryUrl>
-    <License>GPL-3.0-or-later</License>
+    <License>MIT</License>
     <PackageProjectUrl>https://github.com/SceneGate/Lemon/</PackageProjectUrl>
     <PackageTags>romhacking;n3ds;scenegate</PackageTags>
 

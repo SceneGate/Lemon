@@ -11,7 +11,7 @@
     <Company>SceneGate</Company>
     <Copyright>Copyright (c) 2019 SceneGate</Copyright>
     <RepositoryUrl>https://github.com/SceneGate/Lemon/</RepositoryUrl>
-    <License>GPL-3.0-or-later</License>
+    <License>MIT</License>
     <IsPackable>false</IsPackable>
 
     <TargetFrameworks>netcoreapp2.2;net472</TargetFrameworks>
