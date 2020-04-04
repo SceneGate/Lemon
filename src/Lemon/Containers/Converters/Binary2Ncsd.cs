@@ -20,6 +20,7 @@
 namespace Lemon.Containers.Converters
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Lemon.Containers.Formats;
     using Yarhl.FileFormat;
@@ -59,6 +60,7 @@ namespace Lemon.Containers.Converters
         /// </summary>
         /// <param name="source">Binary stream to convert.</param>
         /// <returns>The new NCSD instance.</returns>
+        [SuppressMessage("Reliability", "CA2000", Justification = "Transfer ownership")]
         public Ncsd Convert(BinaryFormat source)
         {
             if (source == null)

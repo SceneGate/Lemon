@@ -20,6 +20,7 @@
 namespace Lemon.Containers.Converters
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Text;
     using Lemon.Logging;
     using Yarhl.FileFormat;
@@ -120,6 +121,7 @@ namespace Lemon.Containers.Converters
             return root;
         }
 
+        [SuppressMessage("Reliability", "CA2000", Justification = "Transfer ownership")]
         void ReadDirectoryInfo(Node parent)
         {
             levelReader.Stream.Position += 4; // no need parent directory

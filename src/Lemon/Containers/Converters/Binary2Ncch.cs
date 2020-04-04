@@ -20,6 +20,7 @@
 namespace Lemon.Containers.Converters
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Lemon.Containers.Formats;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
@@ -65,6 +66,7 @@ namespace Lemon.Containers.Converters
             return ncch;
         }
 
+        [SuppressMessage("Reliability", "CA2000", Justification = "Transfer ownership")]
         static void AddChildIfExists(string name, Node root, DataReader reader)
         {
             BinaryFormat binary = ReadBinaryChild(reader);

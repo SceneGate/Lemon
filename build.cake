@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 // NUnit tests
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.9.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Debug");
@@ -34,10 +34,10 @@ string solutionPath = "src/Lemon.sln";
 string netstandardVersion = "2.0";
 string netstandardBinDir = $"bin/{configuration}/netstandard{netstandardVersion}";
 
-string netVersion = "472";
+string netVersion = "48";
 string netBinDir = $"bin/{configuration}/net{netVersion}";
 
-string netcoreVersion = "2.2";
+string netcoreVersion = "3.1";
 string netcoreBinDir = $"bin/{configuration}/netcoreapp{netcoreVersion}";
 
 Task("Clean")

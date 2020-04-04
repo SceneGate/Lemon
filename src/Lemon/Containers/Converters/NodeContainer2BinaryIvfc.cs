@@ -73,10 +73,10 @@ namespace Lemon.Containers.Converters
         /// <summary>
         /// Initialize the converter by providing the stream to write to.
         /// </summary>
-        /// <param name="stream">Stream to write to.</param>
-        public void Initialize(DataStream stream)
+        /// <param name="parameters">Stream to write to.</param>
+        public void Initialize(DataStream parameters)
         {
-            this.stream = stream;
+            this.stream = parameters;
         }
 
         /// <summary>
@@ -122,13 +122,13 @@ namespace Lemon.Containers.Converters
             binary.Stream.Length += level3Padded;
 
             // Create "special" data streams that will create hashes on-the-fly.
-            var level1 = new LevelStream(BlockSize);
-            var level2 = new LevelStream(BlockSize);
-            var level3 = new LevelStream(BlockSize, binary.Stream.BaseStream);
+            using (var level1 = new LevelStream(BlockSize))
+            using (var level2 = new LevelStream(BlockSize))
+            using (var level3 = new LevelStream(BlockSize, binary.Stream.BaseStream))
             using (var level0Stream = new DataStream(binary.Stream, level0DataOffset, levelSizes[0]))
             using (var level1Stream = new DataStream(level1))
             using (var level2Stream = new DataStream(level2))
-            using (var level3Stream = new DataStream(level3, level3Offset, level3Padded)) {
+            using (var level3Stream = new DataStream(level3, level3Offset, level3Padded, true)) {
                 level3.BlockWritten += (_, e) => level2Stream.Write(e.Hash, 0, e.Hash.Length);
                 level2.BlockWritten += (_, e) => level1Stream.Write(e.Hash, 0, e.Hash.Length);
                 level1.BlockWritten += (_, e) => level0Stream.Write(e.Hash, 0, e.Hash.Length);
