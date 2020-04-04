@@ -20,6 +20,7 @@
 namespace Lemon.Containers.Converters
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
@@ -47,6 +48,7 @@ namespace Lemon.Containers.Converters
         /// </summary>
         /// <param name="source">The binary stream to convert.</param>
         /// <returns>The file system from the ExeFS stream.</returns>
+        [SuppressMessage("Reliability", "CA2000", Justification = "Transfer ownership")]
         public NodeContainerFormat Convert(BinaryFormat source)
         {
             if (source == null)
@@ -138,6 +140,7 @@ namespace Lemon.Containers.Converters
             return binary;
         }
 
+        [SuppressMessage("Reliability", "CA2000", Justification = "Transfer ownership")]
         static Node GetNodeFromHeader(DataReader reader)
         {
             string name = reader.ReadString(8).Replace("\0", string.Empty);

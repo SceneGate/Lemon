@@ -153,9 +153,27 @@ namespace Lemon.Containers.Converters.Ivfc
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Releases all resources used by the object.
+        /// </summary>
+        /// <param name="freeManaged">Whethever to free the managed resources too.</param>
+        protected virtual void Dispose(bool freeManaged)
+        {
+            if (Disposed) {
+                return;
+            }
+
+            Disposed = true;
+            if (freeManaged) {
+                sha.Dispose();
+                if (managedStream) {
+                    stream.Dispose();
+                }
+            }
+        }
+
         void WriteAndUpdateHash(byte[] data, int offset, int count)
         {
-            byte[] empty = Array.Empty<byte>();
             while (true) {
                 // Repeat until writing the data does not span into the next block.
                 long writtenBlocks = Position / BlockSize;
@@ -206,18 +224,6 @@ namespace Lemon.Containers.Converters.Ivfc
             stream.Position = Position;
             Position += count;
             stream.Write(data, index, count);
-        }
-
-        void Dispose(bool freeManaged)
-        {
-            if (Disposed) {
-                return;
-            }
-
-            Disposed = true;
-            if (freeManaged && managedStream) {
-                stream.Dispose();
-            }
         }
     }
 }

@@ -19,5 +19,11 @@
 
     <!-- Allow initializer to have brace in the same line. -->
     <Rule Id="SA1137" Action="None" />
+
+    <!-- Allow hard-coding English exception messages -->
+    <Rule Id="CA1303" Action="None" />
+
+    <!-- Allow TODO messages -->
+    <Rule Id="S1135" Action="None" />
   </Rules>
 </RuleSet>

@@ -85,11 +85,9 @@ namespace Lemon.IntegrationTests.Containers
                     () => node.TransformWith<BinaryIvfc2NodeContainer>(),
                     Throws.Nothing);
                 Assert.That(logger.IsEmpty, Is.True);
-
+            } finally {
                 node.Dispose();
                 Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
-            }
-            catch {
             }
         }
 
@@ -98,7 +96,7 @@ namespace Lemon.IntegrationTests.Containers
         {
             string yaml = File.ReadAllText(yamlPath);
             NodeContainerInfo expected = new DeserializerBuilder()
-                .WithNamingConvention(new UnderscoredNamingConvention())
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
                 .Build()
                 .Deserialize<NodeContainerInfo>(yaml);
 

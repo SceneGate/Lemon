@@ -63,7 +63,7 @@ namespace Lemon.IntegrationTests.Containers
 
             string yaml = File.ReadAllText(yamlPath);
             expected = new DeserializerBuilder()
-                .WithNamingConvention(new UnderscoredNamingConvention())
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
                 .Build()
                 .Deserialize<NcchTestInfo>(yaml);
         }

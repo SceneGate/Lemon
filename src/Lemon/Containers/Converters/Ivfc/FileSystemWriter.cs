@@ -176,10 +176,10 @@ namespace Lemon.Containers.Converters.Ivfc
 
         void WriteNode(Node current, uint currentOffset)
         {
-            var files = current.Children.Where(n => !n.IsContainer).ToList();
-            for (int i = 0; i < files.Count; i++)
+            var subFiles = current.Children.Where(n => !n.IsContainer).ToList();
+            for (int i = 0; i < subFiles.Count; i++)
             {
-                WriteFileInfo(files[i], i == 0, i + 1 == files.Count, currentOffset);
+                WriteFileInfo(subFiles[i], i == 0, i + 1 == subFiles.Count, currentOffset);
             }
 
             var dirs = current.Children.Where(n => n.IsContainer).ToList();

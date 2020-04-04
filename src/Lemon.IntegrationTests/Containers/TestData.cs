@@ -19,13 +19,12 @@
 // SOFTWARE.
 namespace Lemon.IntegrationTests.Containers
 {
-    using System;
     using System.Collections;
     using System.IO;
     using System.Linq;
     using NUnit.Framework;
 
-    public class TestData
+    public static class TestData
     {
         public static string ContainersResources {
             get {

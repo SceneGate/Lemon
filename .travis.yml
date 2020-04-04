@@ -4,9 +4,9 @@ language: csharp
 matrix:
   include:
     - os: linux
-      dist: bionic
+      dist: eoan
       mono: latest
-      dotnet: 2.2
+      dotnet: 3.1
 
 before_script:
 - git lfs install
