@@ -31,6 +31,7 @@ namespace Lemon.Containers.Converters.Ivfc
     {
         readonly IStream stream;
         readonly bool managedStream;
+        readonly object lockObj = new object();
         SHA256 sha;
 
         /// <summary>
@@ -86,6 +87,11 @@ namespace Lemon.Containers.Converters.Ivfc
         /// has been dispsosed.
         /// </summary>
         public bool Disposed { get; private set; }
+
+        /// <summary>
+        /// Gets the stream lock.
+        /// </summary>
+        public object LockObj => lockObj;
 
         /// <summary>
         /// Sets the length of the stream.
