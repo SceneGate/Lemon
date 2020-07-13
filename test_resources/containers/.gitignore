@@ -2,3 +2,6 @@
 *.3ds
 *.csu
 nand.bin
+*.cia
+
+!fake*

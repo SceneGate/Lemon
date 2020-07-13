@@ -23,9 +23,21 @@ namespace Lemon.IntegrationTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using NUnit.Framework;
 
     public static class TestDataBase
     {
+        public static void IgnoreIfFileDoesNotExist(string file)
+        {
+            if (!File.Exists(file)) {
+                TestContext.Progress.WriteLine(
+                    "[{0}] Missing resource file: {1}",
+                    TestContext.CurrentContext.Test.ClassName,
+                    file);
+                Assert.Ignore();
+            }
+        }
+
         public static string RootFromOutputPath {
             get {
                 string envVar = Environment.GetEnvironmentVariable("YARHL_TEST_DIR");
@@ -33,10 +45,11 @@ namespace Lemon.IntegrationTests
                     return envVar;
 
                 string programDir = AppDomain.CurrentDomain.BaseDirectory;
-                return Path.Combine(
+                string path = Path.Combine(
                     programDir,
                     "..", "..", "..", "..", "..",
                     "test_resources");
+                return Path.GetFullPath(path);
             }
         }
 

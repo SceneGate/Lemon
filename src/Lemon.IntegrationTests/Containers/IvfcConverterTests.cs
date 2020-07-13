@@ -52,10 +52,8 @@ namespace Lemon.IntegrationTests.Containers
         [OneTimeSetUp]
         public void SetUpFixture()
         {
-            if (!File.Exists(binaryPath))
-                Assert.Ignore($"Binary file doesn't exist: {binaryPath}");
-            if (!File.Exists(yamlPath))
-                Assert.Ignore($"YAML file doesn't exist: {yamlPath}");
+            TestDataBase.IgnoreIfFileDoesNotExist(binaryPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(yamlPath);
 
             logger = new CaptureLogger();
             LogProvider.SetCurrentLogProvider(logger);

@@ -50,10 +50,8 @@ namespace Lemon.IntegrationTests.Containers
         [OneTimeSetUp]
         public void SetUpFixture()
         {
-            if (!File.Exists(binaryPath))
-                Assert.Ignore($"Binary file doesn't exist: {binaryPath}");
-            if (!File.Exists(yamlPath))
-                Assert.Ignore($"YAML file doesn't exist: {yamlPath}");
+            TestDataBase.IgnoreIfFileDoesNotExist(binaryPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(yamlPath);
 
             var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
             actualNode = new Node("actual", new BinaryFormat(stream));
