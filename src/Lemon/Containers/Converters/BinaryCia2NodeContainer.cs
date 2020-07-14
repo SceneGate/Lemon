@@ -94,6 +94,9 @@ namespace Lemon.Containers.Converters
 
         static Header ReadHeader(DataStream stream)
         {
+            // Read header except content index array.
+            // We don't need it as it's a bit array with a bit set for each
+            // number of content (i.e. 0xC0 means two contents).
             var reader = new DataReader(stream);
             Header header = new Header {
                 HeaderSize = reader.ReadUInt32(),
@@ -104,7 +107,6 @@ namespace Lemon.Containers.Converters
                 TitleMetaLength = reader.ReadUInt32(),
                 MetaLength = reader.ReadUInt32(),
                 ContentLength = reader.ReadInt64(),
-                ContentIndex = reader.ReadBytes(Header.ContentIndexLength),
             };
 
             if (header.Type != 0)
@@ -118,8 +120,6 @@ namespace Lemon.Containers.Converters
 
         private struct Header
         {
-            public const int ContentIndexLength = 0x2000;
-
             public uint HeaderSize { get; set; }
 
             public ushort Type { get; set; }
@@ -135,8 +135,6 @@ namespace Lemon.Containers.Converters
             public uint MetaLength { get; set; }
 
             public long ContentLength { get; set; }
-
-            public byte[] ContentIndex { get; set; }
         }
     }
 }

@@ -1,0 +1,6 @@
+# Manually created and committed
+# TODO
+
+# Optionals not committed
+aofm.cia,aofm_cia.yml
+aofm_legit.cia,aofm_cia_legit.yml

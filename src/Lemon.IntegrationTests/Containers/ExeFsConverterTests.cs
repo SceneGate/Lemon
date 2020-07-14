@@ -24,8 +24,6 @@ namespace Lemon.IntegrationTests.Containers
     using Lemon.Containers.Converters;
     using Lemon.Logging;
     using NUnit.Framework;
-    using YamlDotNet.Serialization;
-    using YamlDotNet.Serialization.NamingConventions;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
@@ -78,26 +76,16 @@ namespace Lemon.IntegrationTests.Containers
         [Test]
         public void TransformToContainer()
         {
-            try {
-                Assert.That(
-                    () => node.TransformWith<BinaryExeFs2NodeContainer>(),
-                    Throws.Nothing);
-                Assert.That(logger.IsEmpty, Is.True);
-            } finally {
-                node.Dispose();
-                Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
-            }
+            int initialStreams = DataStream.ActiveStreams;
+            Assert.That(() => node.TransformWith<BinaryExeFs2NodeContainer>(), Throws.Nothing);
+            Assert.That(DataStream.ActiveStreams, Is.EqualTo(initialStreams - 1));
+            Assert.That(logger.IsEmpty, Is.True);
         }
 
         [Test]
         public void ValidateNodes()
         {
-            string yaml = File.ReadAllText(yamlPath);
-            NodeContainerInfo expected = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build()
-                .Deserialize<NodeContainerInfo>(yaml);
-
+            var expected = NodeContainerInfo.FromYaml(yamlPath);
             node.TransformWith<BinaryExeFs2NodeContainer>();
             CheckNode(expected, node);
         }
@@ -105,28 +93,14 @@ namespace Lemon.IntegrationTests.Containers
         [Test]
         public void TransformBothWays()
         {
-            BinaryFormat expected = null;
-            NodeContainerFormat content = null;
-            BinaryFormat actual = null;
-            try {
-                expected = node.GetFormatAs<BinaryFormat>();
-                content = (NodeContainerFormat)ConvertFormat
+            using BinaryFormat expected = node.GetFormatAs<BinaryFormat>();
+
+            using var content = (NodeContainerFormat)ConvertFormat
                     .With<BinaryExeFs2NodeContainer>(expected);
+            using var actual = (BinaryFormat)ConvertFormat
+                        .With<BinaryExeFs2NodeContainer>(content);
 
-                Assert.That(
-                    () => actual = (BinaryFormat)ConvertFormat
-                        .With<BinaryExeFs2NodeContainer>(content),
-                    Throws.Nothing);
-                Assert.That(logger.IsEmpty, Is.True);
-
-                Assert.That(expected.Stream.Compare(actual.Stream), Is.True);
-            } finally {
-                expected?.Dispose();
-                content?.Dispose();
-                actual?.Dispose();
-                node.Dispose();
-                Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
-            }
+            Assert.That(expected.Stream.Compare(actual.Stream), Is.True);
         }
 
         public void CheckNode(NodeContainerInfo expected, Node actual)
