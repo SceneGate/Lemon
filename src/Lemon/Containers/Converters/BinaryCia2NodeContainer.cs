@@ -45,6 +45,8 @@ namespace Lemon.Containers.Converters
             Header header = ReadHeader(stream);
 
             var container = new NodeContainerFormat();
+            container.Root.Tags["version"] = header.Version;
+            container.Root.Tags["type"] = header.Type;
 
             long certsOffset = header.HeaderSize.Pad(BlockSize);
             Node certs = NodeFactory.FromSubstream(

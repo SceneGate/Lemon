@@ -149,7 +149,7 @@ namespace Lemon.Containers.Converters
             return binary;
         }
 
-        void WriteHeader(DataWriter writer, long[] sizes)
+        static void WriteHeader(DataWriter writer, long[] sizes)
         {
             const uint HeaderSize = 0x5C;
 

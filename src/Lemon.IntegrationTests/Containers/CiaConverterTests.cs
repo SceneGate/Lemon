@@ -19,26 +19,23 @@
 // SOFTWARE.
 namespace Lemon.IntegrationTests.Containers
 {
+    using System.IO;
     using Lemon.Containers.Converters;
     using NUnit.Framework;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
-    [TestFixtureSource(typeof(TestData), nameof(TestData.ExeFsParams))]
-    public class ExeFsConverterTests : Binary2ContainerTests
+    [TestFixtureSource(typeof(TestData), nameof(TestData.CiaParams))]
+    public class CiaConverterTests : Binary2ContainerTests
     {
         readonly string yamlPath;
         readonly string binaryPath;
-        readonly int offset;
-        readonly int size;
 
-        public ExeFsConverterTests(string yamlPath, string binaryPath, int offset, int size)
+        public CiaConverterTests(string yamlPath, string binaryPath)
         {
             this.yamlPath = yamlPath;
             this.binaryPath = binaryPath;
-            this.offset = offset;
-            this.size = size;
 
             TestDataBase.IgnoreIfFileDoesNotExist(binaryPath);
             TestDataBase.IgnoreIfFileDoesNotExist(yamlPath);
@@ -46,8 +43,8 @@ namespace Lemon.IntegrationTests.Containers
 
         protected override BinaryFormat GetBinary()
         {
-            TestContext.WriteLine(binaryPath);
-            var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
+            TestContext.WriteLine(Path.GetFileName(binaryPath));
+            var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read);
             return new BinaryFormat(stream);
         }
 
@@ -58,12 +55,12 @@ namespace Lemon.IntegrationTests.Containers
 
         protected override IConverter<BinaryFormat, NodeContainerFormat> GetToContainerConverter()
         {
-            return new BinaryExeFs2NodeContainer();
+            return new BinaryCia2NodeContainer();
         }
 
         protected override IConverter<NodeContainerFormat, BinaryFormat> GetToBinaryConverter()
         {
-            return new BinaryExeFs2NodeContainer();
+            return null;
         }
     }
 }
