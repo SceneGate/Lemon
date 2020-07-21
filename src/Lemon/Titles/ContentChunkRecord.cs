@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+// Copyright (c) 2020 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,32 +17,52 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.Containers.Formats
+namespace Lemon.Titles
 {
-    using Yarhl.FileSystem;
+    using System;
 
     /// <summary>
-    /// Nintendo Content Container Header.
-    /// This is the format for the CXI and CFA specialization.
-    /// It can contain up to two file systems and several special files.
+    /// Information about a CIA content chunk.
     /// </summary>
-    public class Ncch : NodeContainerFormat
+    public class ContentChunkRecord
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Ncch"/> class.
+        /// Gets or sets the ID of the chunk.
         /// </summary>
-        public Ncch()
-        {
-            Header = new NcchHeader();
-        }
+        public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the header.
+        /// Gets or sets the chunk index which maps into its actual content.
         /// </summary>
-        /// <value>The header.</value>
-        public NcchHeader Header {
-            get;
-            set;
+        public short Index { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of content.
+        /// </summary>
+        public ContentTypeFlags Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the chunk size.
+        /// </summary>
+        public long Size { get; set; }
+
+        /// <summary>
+        /// Gets or sets the chunk hash.
+        /// </summary>
+        public byte[] Hash { get; set; }
+
+        /// <summary>
+        /// Gets the name of the chunk from its index.
+        /// </summary>
+        /// <returns>The chunk's name.</returns>
+        public string GetChunkName()
+        {
+            return Index switch {
+                0 => "program",
+                1 => "manual",
+                2 => "download_play",
+                _ => throw new NotSupportedException(),
+            };
         }
     }
 }

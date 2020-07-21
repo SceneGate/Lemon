@@ -20,6 +20,7 @@
 namespace Lemon.Containers.Converters
 {
     using System;
+    using Lemon.Titles;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
@@ -70,11 +71,7 @@ namespace Lemon.Containers.Converters
                 header.TitleMetaLength);
 
             long contentOffset = (tmdOffset + header.TitleMetaLength).Pad(BlockSize);
-            Node content = NodeFactory.FromSubstream(
-                "content",
-                stream,
-                contentOffset,
-                header.ContentLength);
+            Node content = UnpackContent(title, stream, contentOffset);
 
             long metaOffset = (contentOffset + header.ContentLength).Pad(BlockSize);
             Node metadata = NodeFactory.FromSubstream(
@@ -85,13 +82,6 @@ namespace Lemon.Containers.Converters
 
             AddNodes(container.Root, certs, ticket, title, content, metadata);
             return container;
-        }
-
-        static void AddNodes(Node parent, params Node[] children)
-        {
-            foreach (var child in children) {
-                parent.Add(child);
-            }
         }
 
         static Header ReadHeader(DataStream stream)
@@ -118,6 +108,36 @@ namespace Lemon.Containers.Converters
                 throw new FormatException($"Unsupported version: '{header.Version}'");
 
             return header;
+        }
+
+        static Node UnpackContent(Node titleNode, DataStream stream, long offset)
+        {
+            Node content = NodeFactory.CreateContainer("content");
+
+            var title = (TitleMetadata)ConvertFormat.With<Binary2TitleMetadata>(titleNode.Format);
+            foreach (var chunk in title.Chunks) {
+                var chunkNode = NodeFactory.FromSubstream(
+                    chunk.GetChunkName(),
+                    stream,
+                    offset,
+                    chunk.Size);
+
+                if (chunk.Type.HasFlag(ContentTypeFlags.Encrypted)) {
+                    chunkNode.Tags["LEMON_NCCH_ENCRYPTED"] = true;
+                }
+
+                content.Add(chunkNode);
+                offset += chunk.Size;
+            }
+
+            return content;
+        }
+
+        static void AddNodes(Node parent, params Node[] children)
+        {
+            foreach (var child in children) {
+                parent.Add(child);
+            }
         }
 
         private struct Header

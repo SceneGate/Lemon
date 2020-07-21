@@ -24,7 +24,7 @@ namespace Lemon.Containers.Formats
     /// <summary>
     /// Nintendo CTR SD.
     /// This is the format for the CCI, NAND and CSU specializations.
-    /// It can contains upto 8 containers / nodes.
+    /// It can contains up to 8 containers / nodes.
     /// </summary>
     public class Ncsd : NodeContainerFormat
     {

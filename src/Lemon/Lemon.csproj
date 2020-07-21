@@ -16,6 +16,7 @@
     <PackageProjectUrl>https://github.com/SceneGate/Lemon/</PackageProjectUrl>
     <PackageTags>romhacking;n3ds;scenegate</PackageTags>
 
+    <LangVersion>8.0</LangVersion>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>Lemon</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

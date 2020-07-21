@@ -86,7 +86,7 @@ namespace Lemon.IntegrationTests.Containers
         public void TransformBothWays()
         {
             if (binaryConverter == null) {
-                Assert.Ignore("Not implemented");
+                Assert.Ignore();
             }
 
             using var nodes = containerConverter.Convert(original);

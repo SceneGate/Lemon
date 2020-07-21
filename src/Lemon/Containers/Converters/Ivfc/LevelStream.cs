@@ -84,7 +84,7 @@ namespace Lemon.Containers.Converters.Ivfc
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="LevelStream" />
-        /// has been dispsosed.
+        /// has been disposed.
         /// </summary>
         public bool Disposed { get; private set; }
 
@@ -162,7 +162,7 @@ namespace Lemon.Containers.Converters.Ivfc
         /// <summary>
         /// Releases all resources used by the object.
         /// </summary>
-        /// <param name="freeManaged">Whethever to free the managed resources too.</param>
+        /// <param name="freeManaged">Whether to free the managed resources too.</param>
         protected virtual void Dispose(bool freeManaged)
         {
             if (Disposed) {

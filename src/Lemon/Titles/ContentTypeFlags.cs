@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+// Copyright (c) 2020 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,32 +17,38 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.Containers.Formats
+namespace Lemon.Titles
 {
-    using Yarhl.FileSystem;
+    using System;
 
     /// <summary>
-    /// Nintendo Content Container Header.
-    /// This is the format for the CXI and CFA specialization.
-    /// It can contain up to two file systems and several special files.
+    /// Attributes of a CIA content chunk (NCCH).
     /// </summary>
-    public class Ncch : NodeContainerFormat
-    {
+    [Flags]
+    public enum ContentTypeFlags {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Ncch"/> class.
+        /// The content is encrypted.
         /// </summary>
-        public Ncch()
-        {
-            Header = new NcchHeader();
-        }
+        Encrypted = 1,
 
         /// <summary>
-        /// Gets or sets the header.
+        /// Unknown - The content comes from a disc?
         /// </summary>
-        /// <value>The header.</value>
-        public NcchHeader Header {
-            get;
-            set;
-        }
+        Disc = 2,
+
+        /// <summary>
+        /// Unknown.
+        /// </summary>
+        Cfm = 4,
+
+        /// <summary>
+        /// The content is optional.
+        /// </summary>
+        Optional = 0x4000,
+
+        /// <summary>
+        /// The content is shared.
+        /// </summary>
+        Shared = 0x8000,
     }
 }
