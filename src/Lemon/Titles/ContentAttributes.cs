@@ -25,7 +25,7 @@ namespace Lemon.Titles
     /// Attributes of a CIA content chunk (NCCH).
     /// </summary>
     [Flags]
-    public enum ContentTypeFlags {
+    public enum ContentAttributes {
         /// <summary>
         /// The content is encrypted.
         /// </summary>

@@ -81,7 +81,6 @@ namespace Lemon.Titles
         /// <summary>
         /// Gets or sets the size of the private data of a SRL (DSi) save file.
         /// </summary>
-        /// <value></value>
         public int SrlPrivateSaveSize { get; set; }
 
         /// <summary>

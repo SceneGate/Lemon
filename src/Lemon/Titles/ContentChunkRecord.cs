@@ -20,6 +20,7 @@
 namespace Lemon.Titles
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Information about a CIA content chunk.
@@ -39,7 +40,7 @@ namespace Lemon.Titles
         /// <summary>
         /// Gets or sets the type of content.
         /// </summary>
-        public ContentTypeFlags Type { get; set; }
+        public ContentAttributes Type { get; set; }
 
         /// <summary>
         /// Gets or sets the chunk size.
@@ -49,6 +50,10 @@ namespace Lemon.Titles
         /// <summary>
         /// Gets or sets the chunk hash.
         /// </summary>
+        [SuppressMessage(
+            "Performance",
+            "CA1819",
+            Justification = "This is how .NET API works with hashes too and this is a model")]
         public byte[] Hash { get; set; }
 
         /// <summary>
