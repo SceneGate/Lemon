@@ -28,6 +28,14 @@ namespace Lemon.Titles
     public class TitleMetadata : IFormat
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="TitleMetadata" /> class.
+        /// </summary>
+        public TitleMetadata()
+        {
+            Chunks = new Collection<ContentChunkRecord>();
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the title metadata has a
         /// valid signature.
         /// </summary>
@@ -106,6 +114,6 @@ namespace Lemon.Titles
         /// <summary>
         /// Gets a collection of content chunks.
         /// </summary>
-        public Collection<ContentChunkRecord> Chunks { get; } = new Collection<ContentChunkRecord>();
+        public Collection<ContentChunkRecord> Chunks { get; private set; }
     }
 }

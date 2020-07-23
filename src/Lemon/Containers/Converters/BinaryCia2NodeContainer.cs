@@ -122,7 +122,7 @@ namespace Lemon.Containers.Converters
                     offset,
                     chunk.Size);
 
-                if (chunk.Type.HasFlag(ContentAttributes.Encrypted)) {
+                if (chunk.Attributes.HasFlag(ContentAttributes.Encrypted)) {
                     chunkNode.Tags["LEMON_NCCH_ENCRYPTED"] = true;
                 }
 

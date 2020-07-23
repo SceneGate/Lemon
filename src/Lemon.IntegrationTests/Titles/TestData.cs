@@ -1,4 +1,4 @@
-// Copyright (c) 2020 SceneGate
+// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -17,43 +17,32 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.Titles
+namespace Lemon.IntegrationTests.Titles
 {
-    using System;
+    using System.Collections;
+    using System.IO;
+    using System.Linq;
+    using NUnit.Framework;
 
-    /// <summary>
-    /// Attributes of a CIA content chunk (NCCH).
-    /// </summary>
-    [Flags]
-    public enum ContentAttributes {
-        /// <summary>
-        /// No special attributes.
-        /// </summary>
-        None = 0,
+    public static class TestData
+    {
+        public static IEnumerable TmdParams {
+            get => GetSubstreamAndInfoCollection("tmd.txt");
+        }
 
-        /// <summary>
-        /// The content is encrypted.
-        /// </summary>
-        Encrypted = 1,
+        private static string ResourceDirectory {
+            get => Path.Combine(TestDataBase.RootFromOutputPath, "titles");
+        }
 
-        /// <summary>
-        /// Unknown - The content comes from a disc?
-        /// </summary>
-        Disc = 2,
-
-        /// <summary>
-        /// Unknown.
-        /// </summary>
-        Cfm = 4,
-
-        /// <summary>
-        /// The content is optional.
-        /// </summary>
-        Optional = 0x4000,
-
-        /// <summary>
-        /// The content is shared.
-        /// </summary>
-        Shared = 0x8000,
+        private static IEnumerable GetSubstreamAndInfoCollection(string listName)
+        {
+            return TestDataBase.ReadTestListFile(Path.Combine(ResourceDirectory, listName))
+                    .Select(line => line.Split(','))
+                    .Select(data => new TestFixtureData(
+                        Path.Combine(ResourceDirectory, data[0]),
+                        Path.Combine(ResourceDirectory, data[1]),
+                        int.Parse(data[2]),
+                        int.Parse(data[3])));
+        }
     }
 }

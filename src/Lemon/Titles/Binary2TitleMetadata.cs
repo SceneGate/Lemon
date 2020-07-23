@@ -100,7 +100,7 @@ namespace Lemon.Titles
             var chunk = new ContentChunkRecord {
                 Id = reader.ReadInt32(),
                 Index = reader.ReadInt16(),
-                Type = (ContentAttributes)reader.ReadInt16(),
+                Attributes = (ContentAttributes)reader.ReadInt16(),
                 Size = reader.ReadInt64(),
                 Hash = reader.ReadBytes(0x20),
             };

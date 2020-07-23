@@ -21,6 +21,7 @@ namespace Lemon.Titles
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using YamlDotNet.Serialization;
 
     /// <summary>
     /// Information about a CIA content chunk.
@@ -40,7 +41,7 @@ namespace Lemon.Titles
         /// <summary>
         /// Gets or sets the type of content.
         /// </summary>
-        public ContentAttributes Type { get; set; }
+        public ContentAttributes Attributes { get; set; }
 
         /// <summary>
         /// Gets or sets the chunk size.
@@ -54,6 +55,7 @@ namespace Lemon.Titles
             "Performance",
             "CA1819",
             Justification = "This is how .NET API works with hashes too and this is a model")]
+        [YamlIgnore]
         public byte[] Hash { get; set; }
 
         /// <summary>
