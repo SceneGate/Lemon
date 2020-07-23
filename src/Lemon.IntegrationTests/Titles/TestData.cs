@@ -17,32 +17,32 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.Containers.Formats
+namespace Lemon.IntegrationTests.Titles
 {
-    using Yarhl.FileSystem;
+    using System.Collections;
+    using System.IO;
+    using System.Linq;
+    using NUnit.Framework;
 
-    /// <summary>
-    /// Nintendo Content Container Header.
-    /// This is the format for the CXI and CFA specialization.
-    /// It can contain up to two file systems and several special files.
-    /// </summary>
-    public class Ncch : NodeContainerFormat
+    public static class TestData
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Ncch"/> class.
-        /// </summary>
-        public Ncch()
-        {
-            Header = new NcchHeader();
+        public static IEnumerable TmdParams {
+            get => GetSubstreamAndInfoCollection("tmd.txt");
         }
 
-        /// <summary>
-        /// Gets or sets the header.
-        /// </summary>
-        /// <value>The header.</value>
-        public NcchHeader Header {
-            get;
-            set;
+        private static string ResourceDirectory {
+            get => Path.Combine(TestDataBase.RootFromOutputPath, "titles");
+        }
+
+        private static IEnumerable GetSubstreamAndInfoCollection(string listName)
+        {
+            return TestDataBase.ReadTestListFile(Path.Combine(ResourceDirectory, listName))
+                    .Select(line => line.Split(','))
+                    .Select(data => new TestFixtureData(
+                        Path.Combine(ResourceDirectory, data[0]),
+                        Path.Combine(ResourceDirectory, data[1]),
+                        int.Parse(data[2]),
+                        int.Parse(data[3])));
         }
     }
 }

@@ -1,0 +1,3 @@
+# Optionals not committed
+aofm_cia.yml,aofm.cia
+aofm_cia_legit.yml,aofm_legit.cia

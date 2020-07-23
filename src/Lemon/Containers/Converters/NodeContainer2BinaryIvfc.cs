@@ -115,7 +115,7 @@ namespace Lemon.Containers.Converters
             long level3Offset = binary.Stream.Position;
 
             // Increase the base length so we can create a substream of the correct size
-            // This operation doesn't write and it returns almost inmediatly,
+            // This operation doesn't write and it returns almost immediately,
             // the write happens on the first byte written on the new file space.
             long level3Padded = levelSizes[3].Pad(BlockSize);
             binary.Stream.BaseStream.SetLength(binary.Stream.BaseStream.Length + level3Padded);
@@ -149,7 +149,7 @@ namespace Lemon.Containers.Converters
             return binary;
         }
 
-        void WriteHeader(DataWriter writer, long[] sizes)
+        static void WriteHeader(DataWriter writer, long[] sizes)
         {
             const uint HeaderSize = 0x5C;
 

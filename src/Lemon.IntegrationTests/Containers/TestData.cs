@@ -26,56 +26,48 @@ namespace Lemon.IntegrationTests.Containers
 
     public static class TestData
     {
-        public static string ContainersResources {
-            get {
-                return Path.Combine(TestDataBase.RootFromOutputPath, "containers");
-            }
+        public static IEnumerable NcsdParams {
+            get => GetStreamAndInfoCollection("ncsd.txt");
         }
 
-        public static IEnumerable NcsdParams {
-            get {
-                return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, "ncsd.txt"))
+        public static IEnumerable CiaParams {
+            get => GetStreamAndInfoCollection("cia.txt");
+        }
+
+        public static IEnumerable NcchParams {
+            get => GetSubstreamAndInfoCollection("ncch.txt");
+        }
+
+        public static IEnumerable ExeFsParams {
+            get => GetSubstreamAndInfoCollection("exefs.txt");
+        }
+
+        public static IEnumerable IvfcParams {
+            get => GetSubstreamAndInfoCollection("ivfc.txt");
+        }
+
+        private static string ContainersResources {
+            get => Path.Combine(TestDataBase.RootFromOutputPath, "containers");
+        }
+
+        private static IEnumerable GetStreamAndInfoCollection(string listName)
+        {
+            return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, listName))
                     .Select(line => line.Split(','))
                     .Select(data => new TestFixtureData(
                         Path.Combine(ContainersResources, data[0]),
                         Path.Combine(ContainersResources, data[1])));
-            }
         }
 
-        public static IEnumerable NcchParams {
-            get {
-                return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, "ncch.txt"))
+        private static IEnumerable GetSubstreamAndInfoCollection(string listName)
+        {
+            return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, listName))
                     .Select(line => line.Split(','))
                     .Select(data => new TestFixtureData(
                         Path.Combine(ContainersResources, data[0]),
                         Path.Combine(ContainersResources, data[1]),
                         int.Parse(data[2]),
                         int.Parse(data[3])));
-            }
-        }
-
-        public static IEnumerable ExeFsParams {
-            get {
-                return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, "exefs.txt"))
-                    .Select(line => line.Split(','))
-                    .Select(data => new TestFixtureData(
-                        Path.Combine(ContainersResources, data[0]),
-                        Path.Combine(ContainersResources, data[1]),
-                        int.Parse(data[2]),
-                        int.Parse(data[3])));
-            }
-        }
-
-        public static IEnumerable IvfcParams {
-            get {
-                return TestDataBase.ReadTestListFile(Path.Combine(ContainersResources, "ivfc.txt"))
-                    .Select(line => line.Split(','))
-                    .Select(data => new TestFixtureData(
-                        Path.Combine(ContainersResources, data[0]),
-                        Path.Combine(ContainersResources, data[1]),
-                        int.Parse(data[2]),
-                        int.Parse(data[3])));
-            }
         }
     }
 }

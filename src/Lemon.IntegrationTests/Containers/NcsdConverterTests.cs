@@ -46,10 +46,8 @@ namespace Lemon.IntegrationTests.Containers
         [OneTimeSetUp]
         public void SetUpFixture()
         {
-            if (!File.Exists(ncsdPath))
-                Assert.Ignore($"NCSD file doesn't exist: {ncsdPath}");
-            if (!File.Exists(yamlPath))
-                Assert.Ignore($"YAML file doesn't exist: {yamlPath}");
+            TestDataBase.IgnoreIfFileDoesNotExist(ncsdPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(yamlPath);
 
             actualNode = NodeFactory.FromFile(ncsdPath);
             Assert.That(() => actualNode.TransformTo<Ncsd>(), Throws.Nothing);

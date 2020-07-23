@@ -20,6 +20,10 @@
 namespace Lemon.IntegrationTests.Containers
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.IO;
+    using YamlDotNet.Serialization;
+    using YamlDotNet.Serialization.NamingConventions;
 
     public class NodeContainerInfo
     {
@@ -31,8 +35,19 @@ namespace Lemon.IntegrationTests.Containers
 
         public long StreamLength { get; set; }
 
+        public Dictionary<string, object> Tags { get; set; }
+
         public bool CheckChildren { get; set; }
 
-        public List<NodeContainerInfo> Children { get; set; }
+        public Collection<NodeContainerInfo> Children { get; set; }
+
+        public static NodeContainerInfo FromYaml(string path)
+        {
+            string yaml = File.ReadAllText(path);
+            return new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build()
+                .Deserialize<NodeContainerInfo>(yaml);
+        }
     }
 }

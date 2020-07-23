@@ -14,17 +14,18 @@
     <License>MIT</License>
     <IsPackable>false</IsPackable>
 
+    <LangVersion>8.0</LangVersion>
     <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
     <RootNamespace>Lemon.IntegrationTests</RootNamespace>
     <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="YamlDotNet" Version="8.1.0" />
+    <PackageReference Include="YamlDotNet" Version="8.1.2" />
     <PackageReference Include="nunit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" >
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

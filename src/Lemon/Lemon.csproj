@@ -16,6 +16,7 @@
     <PackageProjectUrl>https://github.com/SceneGate/Lemon/</PackageProjectUrl>
     <PackageTags>romhacking;n3ds;scenegate</PackageTags>
 
+    <LangVersion>8.0</LangVersion>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>Lemon</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -23,15 +24,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="8.1.2" />
     <PackageReference Include="LibLog" Version="5.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.6.0.16497" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.9.0.19135">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

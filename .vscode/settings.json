@@ -1,3 +1,9 @@
 {
-    "dotnet-test-explorer.testProjectPath": "src/Lemon.IntegrationTests/Lemon.IntegrationTests.csproj"
+    "dotnet-test-explorer.testProjectPath": "src/Lemon.IntegrationTests/Lemon.IntegrationTests.csproj",
+    "cSpell.words": [
+        "IVFC",
+        "NAND",
+        "NCCH",
+        "NCSD"
+    ]
 }

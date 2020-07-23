@@ -17,23 +17,25 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.IntegrationTests.Containers
+namespace Lemon.IntegrationTests.Titles
 {
+    using System.IO;
     using Lemon.Containers.Converters;
+    using Lemon.Titles;
     using NUnit.Framework;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
-    [TestFixtureSource(typeof(TestData), nameof(TestData.ExeFsParams))]
-    public class ExeFsConverterTests : Binary2ContainerTests
+    [TestFixtureSource(typeof(TestData), nameof(TestData.TmdParams))]
+    public class Binary2TitleMetadataTests : Binary2ObjectTests<TitleMetadata>
     {
         readonly string yamlPath;
         readonly string binaryPath;
         readonly int offset;
         readonly int size;
 
-        public ExeFsConverterTests(string yamlPath, string binaryPath, int offset, int size)
+        public Binary2TitleMetadataTests(string yamlPath, string binaryPath, int offset, int size)
         {
             this.yamlPath = yamlPath;
             this.binaryPath = binaryPath;
@@ -51,19 +53,20 @@ namespace Lemon.IntegrationTests.Containers
             return new BinaryFormat(stream);
         }
 
-        protected override NodeContainerInfo GetContainerInfo()
+        protected override string GetObjectYaml()
         {
-            return NodeContainerInfo.FromYaml(yamlPath);
+            return File.ReadAllText(yamlPath);
         }
 
-        protected override IConverter<BinaryFormat, NodeContainerFormat> GetToContainerConverter()
+        protected override IConverter<BinaryFormat, TitleMetadata> GetToObjectConverter()
         {
-            return new BinaryExeFs2NodeContainer();
+            return new Binary2TitleMetadata();
         }
 
-        protected override IConverter<NodeContainerFormat, BinaryFormat> GetToBinaryConverter()
+        protected override IConverter<TitleMetadata, BinaryFormat> GetToBinaryConverter()
         {
-            return new BinaryExeFs2NodeContainer();
+            TestContext.Progress.WriteLine("Binary converter for TMD not implemented");
+            return null;
         }
     }
 }
