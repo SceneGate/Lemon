@@ -31,6 +31,9 @@ namespace Lemon.Containers.Converters
     /// </summary>
     public class Binary2Ncch : IConverter<BinaryFormat, Ncch>
     {
+        const int HeaderLength = 0x200;
+        const int AccessDescriptorLength = 0x400;
+
         /// <summary>
         /// Converts a binary stream into a NCCH instance.
         /// </summary>
@@ -51,9 +54,14 @@ namespace Lemon.Containers.Converters
                 throw new FormatException("Invalid Magic ID");
 
             // TODO: Read header
-            source.Stream.Position = 0x190;
+            source.Stream.Position = 0x180;
+            uint exHeaderLength = reader.ReadUInt32();
+            if (exHeaderLength != 0) {
+                AddExtendedHeader(ncch.Root, exHeaderLength, source.Stream);
+            }
 
             // Read the subfiles
+            source.Stream.Position = 0x190;
             AddChildIfExists("sdk_info.txt", ncch.Root, reader);
             AddChildIfExists("logo.bin", ncch.Root, reader);
             AddChildIfExists("system", ncch.Root, reader);
@@ -64,6 +72,25 @@ namespace Lemon.Containers.Converters
 
             // TODO: Read rest of header
             return ncch;
+        }
+
+        static void AddExtendedHeader(Node root, uint length, DataStream baseStream)
+        {
+            // Extended header is just after the NCCH header
+            var extendedHeader = NodeFactory.FromSubstream(
+                "extended_header",
+                baseStream,
+                HeaderLength,
+                length);
+            root.Add(extendedHeader);
+
+            // Access descriptor is just after the extended header
+            var accessDescriptor = NodeFactory.FromSubstream(
+                "access_descriptor",
+                baseStream,
+                HeaderLength + length,
+                AccessDescriptorLength);
+            root.Add(accessDescriptor);
         }
 
         [SuppressMessage("Reliability", "CA2000", Justification = "Transfer ownership")]
