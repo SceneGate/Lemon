@@ -17,7 +17,7 @@
     <PackageTags>romhacking;n3ds;scenegate</PackageTags>
 
     <LangVersion>8.0</LangVersion>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Lemon</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>

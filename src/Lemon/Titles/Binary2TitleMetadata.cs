@@ -41,6 +41,7 @@ namespace Lemon.Titles
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
+            source.Stream.Position = 0;
             var reader = new DataReader(source.Stream) {
                 Endianness = EndiannessMode.BigEndian,
             };
