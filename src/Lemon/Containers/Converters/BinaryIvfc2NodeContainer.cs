@@ -17,12 +17,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.Containers.Converters
+namespace SceneGate.Lemon.Containers.Converters
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
-    using Lemon.Logging;
+    using SceneGate.Lemon.Logging;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;

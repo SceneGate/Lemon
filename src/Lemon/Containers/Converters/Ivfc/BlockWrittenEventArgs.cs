@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.Containers.Converters.Ivfc
+namespace SceneGate.Lemon.Containers.Converters.Ivfc
 {
     /// <summary>
     /// Event argument for written blocks of data.

@@ -17,9 +17,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.IntegrationTests.Containers
+namespace SceneGate.Lemon.IntegrationTests.Containers
 {
-    using Lemon.Containers.Formats;
+    using SceneGate.Lemon.Containers.Formats;
 
     public class NcsdTestInfo
     {
@@ -43,7 +43,7 @@ namespace Lemon.IntegrationTests.Containers
             set;
         }
 
-        public FirmwareType[] FirmwaresType{
+        public FirmwareType[] FirmwaresType {
             get;
             set;
         }

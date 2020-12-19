@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.IntegrationTests
+namespace SceneGate.Lemon.IntegrationTests
 {
     using System;
     using System.Collections.Generic;
@@ -27,17 +27,6 @@ namespace Lemon.IntegrationTests
 
     public static class TestDataBase
     {
-        public static void IgnoreIfFileDoesNotExist(string file)
-        {
-            if (!File.Exists(file)) {
-                TestContext.Progress.WriteLine(
-                    "[{0}] Missing resource file: {1}",
-                    TestContext.CurrentContext.Test.ClassName,
-                    file);
-                Assert.Ignore();
-            }
-        }
-
         public static string RootFromOutputPath {
             get {
                 string envVar = Environment.GetEnvironmentVariable("YARHL_TEST_DIR");
@@ -47,9 +36,24 @@ namespace Lemon.IntegrationTests
                 string programDir = AppDomain.CurrentDomain.BaseDirectory;
                 string path = Path.Combine(
                     programDir,
-                    "..", "..", "..", "..", "..",
+                    "..",
+                    "..",
+                    "..",
+                    "..",
+                    "..",
                     "test_resources");
                 return Path.GetFullPath(path);
+            }
+        }
+
+        public static void IgnoreIfFileDoesNotExist(string file)
+        {
+            if (!File.Exists(file)) {
+                TestContext.Progress.WriteLine(
+                    "[{0}] Missing resource file: {1}",
+                    TestContext.CurrentContext.Test.ClassName,
+                    file);
+                Assert.Ignore();
             }
         }
 
