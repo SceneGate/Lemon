@@ -3,10 +3,12 @@
 [Yarhl](https://github.com/SceneGate/yarhl) plugin for Nintendo 3DS common
 formats.
 
+The library supports .NET 5.0 and above on Linux, Window and MacOS.
+
 <!-- prettier-ignore -->
 | Release | Package                                                           |
 | ------- | ----------------------------------------------------------------- |
-| Stable  | [![Nuget](https://img.shields.io/nuget/v/PleOps.Cake?label=nuget.org&logo=nuget)](https://www.nuget.org/packages/PleOps.Cake) |
+| Stable  | [![Nuget](https://img.shields.io/nuget/v/SceneGate.Lemon?label=nuget.org&logo=nuget)](https://www.nuget.org/packages/SceneGate.Lemon) |
 | Preview | [Azure Artifacts](https://dev.azure.com/SceneGate/SceneGate/_packaging?_a=feed&feed=SceneGate-Preview) |
 
 ## Supported formats
@@ -26,28 +28,6 @@ Feel free to ask any question in the
 [project Discussion site!](https://github.com/SceneGate/Lemon/discussions)
 
 Check our on-line [API documentation](https://scenegate.github.io/Lemon/).
-
-## Install
-
-Stable releases are available from nuget.org:
-
-- [SceneGate.Lemon](https://www.nuget.org/packages/SceneGate.Lemon)
-
-The library targets and tests in the .NET 5.0 runtime.
-
-Preview releases can be found in this
-[Azure DevOps package repository](https://dev.azure.com/SceneGate/SceneGate/_packaging?_a=feed&feed=SceneGate-Preview).
-To use a preview release, create a file `nuget.config` in the same directory of
-your solution (.sln) file with the following content:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageSources>
-    <add key="SceneGate-Preview" value="https://pkgs.dev.azure.com/SceneGate/SceneGate/_packaging/SceneGate-Preview/nuget/v3/index.json" />
-  </packageSources>
-</configuration>
-```
 
 ## Build
 
