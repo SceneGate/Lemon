@@ -16,7 +16,7 @@ The library supports .NET 5.0 and above on Linux, Window and MacOS.
 _Encryption, decryption or signature validation not supported yet._
 
 - **NCSD (CCI and CSU)**: unpack
-- **CIA**: unpack
+- **CIA**: unpack and pack
 - **NCCH (CXI and CFA)**: unpack
 - **ExeFS**: unpack and pack
 - **RomFS**: unpack and pack

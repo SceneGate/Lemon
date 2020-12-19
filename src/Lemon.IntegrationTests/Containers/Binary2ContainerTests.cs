@@ -90,7 +90,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
             using var nodes = containerConverter.Convert(original);
             using var actualBinary = binaryConverter.Convert(nodes);
 
-            Assert.That(original.Stream.Compare(actualBinary.Stream), Is.True);
+            Assert.That(original.Stream.Compare(actualBinary.Stream), Is.True, "Streams are not identical");
         }
 
         protected abstract BinaryFormat GetBinary();

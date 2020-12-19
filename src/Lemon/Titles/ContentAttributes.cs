@@ -22,7 +22,7 @@ namespace SceneGate.Lemon.Titles
     using System;
 
     /// <summary>
-    /// Attributes of a CIA content chunk (NCCH).
+    /// Attributes for a partition (NCCH) from the title metadata.
     /// </summary>
     [Flags]
     public enum ContentAttributes {
@@ -37,7 +37,7 @@ namespace SceneGate.Lemon.Titles
         Encrypted = 1,
 
         /// <summary>
-        /// Unknown - The content comes from a disc?
+        /// Unknown. The content comes from a cartridge?
         /// </summary>
         Disc = 2,
 

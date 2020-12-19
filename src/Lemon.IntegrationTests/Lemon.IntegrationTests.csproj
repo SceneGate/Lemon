@@ -7,7 +7,6 @@
     <RootNamespace>SceneGate.Lemon.IntegrationTests</RootNamespace>
     <Description>Integration tests for Lemon.</Description>
     <TargetFrameworks>net5.0</TargetFrameworks>
-    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

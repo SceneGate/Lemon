@@ -60,8 +60,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 
         protected override IConverter<NodeContainerFormat, BinaryFormat> GetToBinaryConverter()
         {
-            TestContext.Progress.WriteLine("Binary converter for CIA not implemented");
-            return null;
+            return new NodeContainer2BinaryCia();
         }
     }
 }
