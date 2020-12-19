@@ -46,6 +46,8 @@ namespace SceneGate.Lemon.Containers.Converters
             Header header = ReadHeader(stream);
 
             var container = new NodeContainerFormat();
+
+            // These are for reference, they shouldn't be other than 0 in 3DS.
             container.Root.Tags["version"] = header.Version;
             container.Root.Tags["type"] = header.Type;
 
