@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.IntegrationTests.Titles
+namespace SceneGate.Lemon.IntegrationTests.Titles
 {
     using System.Collections;
     using System.IO;
@@ -30,7 +30,7 @@ namespace Lemon.IntegrationTests.Titles
             get => GetSubstreamAndInfoCollection("tmd.txt");
         }
 
-        private static string ResourceDirectory {
+        public static string ResourceDirectory {
             get => Path.Combine(TestDataBase.RootFromOutputPath, "titles");
         }
 

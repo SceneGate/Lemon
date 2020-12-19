@@ -1,0 +1,19 @@
+<Project>
+    <!-- Centralize dependency management -->
+    <ItemGroup>
+        <PackageVersion Include="Yarhl" Version="3.1.0-preview.83" />
+        <PackageVersion Include="LibLog" Version="5.0.8" />
+        <PackageVersion Include="YamlDotNet" Version="9.1.0" />
+
+        <PackageVersion Include="nunit" Version="3.12.0" />
+        <PackageVersion Include="NUnit3TestAdapter" Version="3.17.0" />
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="16.8.3"/>
+        <PackageVersion Include="coverlet.collector" Version="1.3.0" />
+
+        <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+
+        <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
+        <PackageVersion Include="SonarAnalyzer.CSharp" Version="8.15.0.24505" />
+        <PackageVersion Include="Roslynator.Analyzers" Version="3.0.0" />
+    </ItemGroup>
+</Project>

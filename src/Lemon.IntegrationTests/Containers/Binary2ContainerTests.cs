@@ -17,10 +17,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace Lemon.IntegrationTests.Containers
+namespace SceneGate.Lemon.IntegrationTests.Containers
 {
-    using Lemon.Logging;
     using NUnit.Framework;
+    using SceneGate.Lemon.Logging;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
@@ -71,14 +71,12 @@ namespace Lemon.IntegrationTests.Containers
         [Test]
         public void TransformToContainer()
         {
-            int initialStreams = DataStream.ActiveStreams;
-
             // Check nodes are expected
             using var nodes = containerConverter.Convert(original);
             CheckNode(containerInfo, nodes.Root);
 
-            // Check everything is virtual node
-            Assert.That(DataStream.ActiveStreams, Is.EqualTo(initialStreams));
+            // Check everything is virtual node (only the binary stream)
+            Assert.That(DataStream.ActiveStreams, Is.EqualTo(initialStreams + 1));
             Assert.That(logger.IsEmpty, Is.True);
         }
 
