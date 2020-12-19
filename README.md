@@ -1,9 +1,7 @@
-# Lemon [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://choosealicense.com/licenses/mit/)
+# Lemon [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://choosealicense.com/licenses/mit/) ![Build and release](https://github.com/SceneGate/Lemon/workflows/Build%20and%20release/badge.svg)
 
 [Yarhl](https://github.com/SceneGate/yarhl) plugin for Nintendo 3DS common
 formats.
-
-TODO BADGE
 
 <!-- prettier-ignore -->
 | Release | Package                                                           |
@@ -33,7 +31,7 @@ Check our on-line [API documentation](https://scenegate.github.io/Lemon/).
 
 Stable releases are available from nuget.org:
 
-- Soon available.
+- [SceneGate.Lemon](https://www.nuget.org/packages/SceneGate.Lemon)
 
 The library targets and tests in the .NET 5.0 runtime.
 

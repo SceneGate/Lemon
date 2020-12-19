@@ -36,12 +36,10 @@ namespace SceneGate.Lemon.IntegrationTests
                 string programDir = AppDomain.CurrentDomain.BaseDirectory;
                 string path = Path.Combine(
                     programDir,
-                    "..",
-                    "..",
-                    "..",
-                    "..",
-                    "..",
-                    "test_resources");
+                    "..", // framework
+                    "..", // configuration
+                    "..", // bin
+                    "Resources");
                 return Path.GetFullPath(path);
             }
         }
