@@ -150,6 +150,12 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             WriteAndUpdateHash(buffer, index, count);
         }
 
+        /// <inheritdoc />
+        public void Flush()
+        {
+            stream.Flush();
+        }
+
         /// <summary>
         /// Releases all resource used by the <see cref="LevelStream"/> object.
         /// </summary>

@@ -99,7 +99,7 @@ namespace SceneGate.Lemon.Containers.Converters
             // We create a new sub-stream because all the offset are relative
             // to this section.
             long level3Offset = (headerSize + level0Size).Pad(Level0Padding);
-            using (var level3 = new DataStream(reader.Stream, level3Offset, level3Size)) {
+            using (var level3 = DataStreamFactory.FromStream(reader.Stream, level3Offset, level3Size)) {
                 levelReader = new DataReader(level3);
 
                 // First we have the header. Since we don't need to search an
