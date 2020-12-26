@@ -119,7 +119,7 @@ namespace SceneGate.Lemon.Containers.Converters
             // the write happens on the first byte written on the new file space.
             long level3Padded = levelSizes[3].Pad(BlockSize);
             binary.Stream.BaseStream.SetLength(binary.Stream.BaseStream.Length + level3Padded);
-            binary.Stream.Length += level3Padded;
+            binary.Stream.SetLength(binary.Stream.Length + level3Padded);
 
             // Create "special" data streams that will create hashes on-the-fly.
             using (var level1 = new LevelStream(BlockSize))

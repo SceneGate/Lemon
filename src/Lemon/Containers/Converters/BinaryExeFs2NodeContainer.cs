@@ -21,6 +21,7 @@ namespace SceneGate.Lemon.Containers.Converters
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
@@ -76,7 +77,7 @@ namespace SceneGate.Lemon.Containers.Converters
                 source.Stream.RunInPosition(
                     () => expected = reader.ReadBytes(Sha256Size),
                     totalHashSize - (Sha256Size * (i + 1)),
-                    SeekMode.Current);
+                    SeekOrigin.Current);
 
                 byte[] actual = ComputeHash(container.Root.Children[i].Stream);
 
@@ -120,7 +121,7 @@ namespace SceneGate.Lemon.Containers.Converters
                         writer.WritePadding(0x00, 0x200);
                     },
                     0,
-                    SeekMode.End);
+                    SeekOrigin.End);
             }
 
             binary.Stream.Position = NumberFiles * 0x10;
@@ -134,7 +135,7 @@ namespace SceneGate.Lemon.Containers.Converters
                 binary.Stream.RunInPosition(
                     () => writer.Write(hash),
                     totalHashSize - (Sha256Size * (i + 1)),
-                    SeekMode.Current);
+                    SeekOrigin.Current);
             }
 
             return binary;
