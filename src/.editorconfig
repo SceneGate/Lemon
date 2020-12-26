@@ -27,10 +27,10 @@ dotnet_style_qualification_for_event = false:silent
 
 ### Language keywords instead of framework type names for type references
 dotnet_style_predefined_type_for_locals_parameters_members = true:warning
-dotnet_style_predefined_type_for_member_access = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:warning
 
 ### Modifier preferences
-dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
 dotnet_style_readonly_field = true:warning
 
 ### Parentheses preferences
@@ -113,13 +113,13 @@ csharp_preferred_modifier_order = public,private,protected,internal,static,exter
 
 ## C# formatting rules
 ### New line preferences
-csharp_new_line_before_open_brace = local_functions,methods,types:warning
-csharp_new_line_before_else = false:warning
-csharp_new_line_before_catch = false:warning
-csharp_new_line_before_finally = false:warning
-csharp_new_line_before_members_in_object_initializers = true:warning
-csharp_new_line_before_members_in_anonymous_types = true:warning
-csharp_new_line_between_query_expression_clauses = true:warning
+csharp_new_line_before_open_brace = local_functions,methods,types
+csharp_new_line_before_else = false
+csharp_new_line_before_catch = false
+csharp_new_line_before_finally = false
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
 
 ### Indentation preferences
 csharp_indent_case_contents = true:warning
@@ -166,7 +166,7 @@ dotnet_diagnostic.CA1303.severity = none # We don't translate exception and log 
 
 ### StyleCop
 dotnet_diagnostic.SA1101.severity = none # Do not force to prefix local calls with 'this'
-dotnet_diagnostic.SA1400.severity = suggestion # Access modifier not mandatory.
+dotnet_diagnostic.SA1400.severity = suggestion # Access modifier may be omitted
 dotnet_diagnostic.SA1500.severity = none # Allow inline braces
 dotnet_diagnostic.SA1503.severity = suggestion # Braces can be omitted (guards can)
 dotnet_diagnostic.SA1633.severity = none # No XML-format header in source files
