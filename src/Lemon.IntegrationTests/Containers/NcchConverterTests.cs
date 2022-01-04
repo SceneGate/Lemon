@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,43 +21,50 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 {
     using System.IO;
     using NUnit.Framework;
+    using SceneGate.Lemon.Containers.Converters;
     using SceneGate.Lemon.Containers.Formats;
+    using SceneGate.Lemon.Logging;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
+    using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
     [TestFixtureSource(typeof(TestData), nameof(TestData.NcchParams))]
     public class NcchConverterTests
     {
+        readonly CaptureLogger logger;
+        int initialStreams;
+        BinaryFormat original;
+        IConverter<BinaryFormat, Ncch> containerConverter;
+        IConverter<Ncch, BinaryFormat> binaryConverter;
+
         readonly string yamlPath;
         readonly string binaryPath;
         readonly int offset;
         readonly int size;
 
-        Node actualNode;
-        Ncch actual;
         NcchTestInfo expected;
 
         public NcchConverterTests(string yamlPath, string binaryPath, int offset, int size)
         {
+            logger = new CaptureLogger();
+            LogProvider.SetCurrentLogProvider(logger);
+
             this.yamlPath = yamlPath;
             this.binaryPath = binaryPath;
             this.offset = offset;
             this.size = size;
+
+            TestDataBase.IgnoreIfFileDoesNotExist(binaryPath);
+            TestDataBase.IgnoreIfFileDoesNotExist(yamlPath);
         }
 
         [OneTimeSetUp]
         public void SetUpFixture()
         {
-            TestDataBase.IgnoreIfFileDoesNotExist(binaryPath);
-            TestDataBase.IgnoreIfFileDoesNotExist(yamlPath);
-
-            var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
-            actualNode = new Node("actual", new BinaryFormat(stream));
-
-            Assert.That(() => actualNode.TransformTo<Ncch>(), Throws.Nothing);
-            actual = actualNode.GetFormatAs<Ncch>();
+            containerConverter = new Binary2Ncch();
+            binaryConverter = new Ncch2Binary();
 
             string yaml = File.ReadAllText(yamlPath);
             expected = new DeserializerBuilder()
@@ -66,22 +73,66 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
                 .Deserialize<NcchTestInfo>(yaml);
         }
 
-        [OneTimeTearDown]
-        public void TearDownFixture()
+        [TearDown]
+        public void TearDown()
         {
-            actualNode?.Dispose();
-            Assert.That(DataStream.ActiveStreams, Is.EqualTo(0));
+            original?.Dispose();
+
+            // Make sure we didn't leave anything without dispose.
+            Assert.That(DataStream.ActiveStreams, Is.EqualTo(initialStreams));
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            logger.Clear();
+
+            // By opening and disposing in each we prevent other tests failing
+            // because the file is still open.
+            initialStreams = DataStream.ActiveStreams;
+            original = GetBinary(offset, size);
         }
 
         [Test]
-        public void ValidateHeader()
+        public void TransformToContainer()
+        {
+            // Check header and regions are expected
+            using var actual = containerConverter.Convert(original);
+            ValidateHeader(actual);
+            ValidateRegions(actual);
+
+            // Check everything is virtual node (only the binary stream)
+            Assert.That(DataStream.ActiveStreams, Is.EqualTo(initialStreams + 1));
+            Assert.That(logger.IsEmpty, Is.True);
+        }
+
+        [Test]
+        public void TransformBothWays()
+        {
+            if (binaryConverter == null) {
+                Assert.Ignore();
+            }
+
+            using var actual = containerConverter.Convert(original);
+            using var actualBinary = binaryConverter.Convert(actual);
+
+            Assert.That(original.Stream.Compare(actualBinary.Stream), Is.True, "Streams are not identical");
+        }
+
+        protected BinaryFormat GetBinary(int offset, int size)
+        {
+            TestContext.WriteLine(Path.GetFileName(binaryPath));
+            var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
+            return new BinaryFormat(stream);
+        }
+
+        public void ValidateHeader(Ncch actual)
         {
             var header = actual.Header;
             Assert.That(header.Signature, Has.Length.EqualTo(expected.SignatureLength));
         }
 
-        [Test]
-        public void ValidateRegions()
+        public void ValidateRegions(Ncch actual)
         {
             Assert.That(
                 actual.Root.Children,
