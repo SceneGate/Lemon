@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,5 +54,35 @@ namespace SceneGate.Lemon.Containers.Formats
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets the partition id.
+        /// </summary>
+        public long PartitionId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maker code.
+        /// </summary>
+        public short MakerCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the version.
+        /// </summary>
+        public short Version { get; set; }
+
+        /// <summary>
+        /// Gets or sets the program id.
+        /// </summary>
+        public long ProgramId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the product code.
+        /// </summary>
+        public string ProductCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the flags.
+        /// </summary>
+        public byte[] Flags { get; set; }
     }
 }

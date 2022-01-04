@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,25 @@ namespace SceneGate.Lemon.Containers.Converters
             if (reader.ReadString(4) != NcchHeader.MagicId)
                 throw new FormatException("Invalid Magic ID");
 
-            // TODO: Read header
+            source.Stream.Position = 0x108;
+            header.PartitionId = reader.ReadInt64();
+            header.MakerCode = reader.ReadInt16();
+            header.Version = reader.ReadInt16();
+
+            source.Stream.Position = 0x118;
+            header.ProgramId = reader.ReadInt64();
+
+            source.Stream.Position = 0x150;
+            header.ProductCode = reader.ReadString(0x10).Replace("\0", string.Empty);
+
+            source.Stream.Position = 0x188;
+            byte[] flags = new byte[0x8];
+            for (int i = 0; i < flags.Length; i++) {
+                flags[i] = reader.ReadByte();
+            }
+
+            header.Flags = flags;
+
             source.Stream.Position = 0x180;
             uint exHeaderLength = reader.ReadUInt32();
             if (exHeaderLength != 0) {
@@ -70,7 +88,6 @@ namespace SceneGate.Lemon.Containers.Converters
             source.Stream.Position += 8;
             AddChildIfExists("rom", ncch.Root, reader);
 
-            // TODO: Read rest of header
             return ncch;
         }
 
