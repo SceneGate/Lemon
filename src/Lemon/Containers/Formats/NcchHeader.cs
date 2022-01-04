@@ -84,5 +84,15 @@ namespace SceneGate.Lemon.Containers.Formats
         /// Gets or sets the flags.
         /// </summary>
         public byte[] Flags { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of the system region (in units) that will be used for calculating the hash.
+        /// </summary>
+        public int SystemHashSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of the program region (in units) that will be used for calculating the hash.
+        /// </summary>
+        public int RomHashSize { get; set; }
     }
 }

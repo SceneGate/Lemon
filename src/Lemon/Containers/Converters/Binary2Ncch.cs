@@ -84,9 +84,12 @@ namespace SceneGate.Lemon.Containers.Converters
             AddChildIfExists("logo.bin", ncch.Root, reader);
             AddChildIfExists("system", ncch.Root, reader);
 
-            // TODO: Read these fields
-            source.Stream.Position += 8;
+            header.SystemHashSize = reader.ReadInt32();
+            source.Stream.Position += 4; // Reserved
+
             AddChildIfExists("rom", ncch.Root, reader);
+
+            header.RomHashSize = reader.ReadInt32();
 
             return ncch;
         }

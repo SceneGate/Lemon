@@ -119,15 +119,15 @@ namespace SceneGate.Lemon.Containers.Converters
             writer.Stream.Position = 0x190;
             WriteOffsetSizeAndData(writer, root.Children["sdk_info.txt"]);
             WriteOffsetSizeAndData(writer, root.Children["logo.bin"]);
-            WriteOffsetSizeAndData(writer, root.Children["system"], true);
+            WriteOffsetSizeAndData(writer, root.Children["system"], source.Header.SystemHashSize, true);
 
             writer.Stream.Position += 0x4; // Reserved
-            WriteOffsetSizeAndData(writer, root.Children["rom"], true);
+            WriteOffsetSizeAndData(writer, root.Children["rom"], source.Header.RomHashSize, true);
 
             writer.Stream.Position += 0x4; // Reserved
 
-            WriteSHA256(writer, root.Children["system"], true);
-            WriteSHA256(writer, root.Children["rom"], true);
+            WriteSHA256(writer, root.Children["system"], source.Header.SystemHashSize, true);
+            WriteSHA256(writer, root.Children["rom"], source.Header.RomHashSize, true);
 
             // Write the full size of the binary (in units) in 0x104
             writer.Stream.Position = 0x104;
@@ -151,7 +151,7 @@ namespace SceneGate.Lemon.Containers.Converters
             file.Stream.WriteTo(writer.Stream);
         }
 
-        void WriteOffsetSizeAndData(DataWriter writer, Node file, bool hasHashRegion = false)
+        void WriteOffsetSizeAndData(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
         {
             long position = writer.Stream.Position;
 
@@ -168,11 +168,11 @@ namespace SceneGate.Lemon.Containers.Converters
             }
 
             if (hasHashRegion) {
-                writer.Write(0x1);
+                writer.Write(hashRegion);
             }
         }
 
-        void WriteSHA256(DataWriter writer, Node file, bool hasHashRegion = false)
+        void WriteSHA256(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
         {
             using (SHA256 sha256 = SHA256.Create()) {
                 try {
@@ -181,15 +181,16 @@ namespace SceneGate.Lemon.Containers.Converters
                         return;
                     }
 
-                    if (hasHashRegion) {
-                        int hashSize = 0x200;
+                    if (hasHashRegion && hashRegion == 0) {
+                        writer.Write(sha256.ComputeHash(new byte[0x0]));
+                    } else if (hasHashRegion) {
+                        int hashSize = hashRegion * 0x200;
                         byte[] buffer = new byte[hashSize];
                         file.Stream.Position = 0;
                         file.Stream.Read(buffer, 0, hashSize);
 
                         writer.Write(sha256.ComputeHash(buffer));
-                    }
-                    else {
+                    } else {
                         writer.Write(sha256.ComputeHash(file.Stream));
                     }
                 } catch (Exception ex) {
