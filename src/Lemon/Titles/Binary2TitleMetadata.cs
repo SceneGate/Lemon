@@ -1,4 +1,4 @@
-// Copyright (c) 2020 SceneGate
+﻿// Copyright (c) 2020 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,12 +46,16 @@ namespace SceneGate.Lemon.Titles
                 Endianness = EndiannessMode.BigEndian,
             };
 
+            TitleMetadata metadata = new TitleMetadata();
+
             // TODO: Validate signature
             uint signType = reader.ReadUInt32();
+            metadata.SignType = signType;
             int signSize = GetSignatureSize(signType);
+            metadata.SignSize = signSize;
             source.Stream.Position += signSize;
 
-            TitleMetadata metadata = ReadHeader(reader, out int contentCount);
+            metadata = ReadHeader(reader, out int contentCount, metadata);
 
             // TODO: Validate chunk records
             source.Stream.Position += NumContentInfo * InfoRecordSize;
@@ -64,9 +68,8 @@ namespace SceneGate.Lemon.Titles
             return metadata;
         }
 
-        static TitleMetadata ReadHeader(DataReader reader, out int contentCount)
+        static TitleMetadata ReadHeader(DataReader reader, out int contentCount, TitleMetadata metadata)
         {
-            var metadata = new TitleMetadata();
             metadata.SignatureIssuer = reader.ReadString(0x40).Replace("\0", string.Empty);
             metadata.Version = reader.ReadByte();
             metadata.CaCrlVersion = reader.ReadByte();

@@ -1,4 +1,4 @@
-// Copyright (c) 2020 SceneGate
+﻿// Copyright (c) 2020 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,16 @@ namespace SceneGate.Lemon.Titles
         {
             Chunks = new Collection<ContentChunkRecord>();
         }
+
+        /// <summary>
+        /// Gets or sets the signature type.
+        /// </summary>
+        public uint SignType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the signature size.
+        /// </summary>
+        public int SignSize { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the title metadata has a

@@ -1,4 +1,4 @@
-// Copyright (c) 2020 SceneGate
+﻿// Copyright (c) 2020 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 namespace SceneGate.Lemon.Containers.Converters
 {
     using System;
+    using System.Security.Cryptography;
     using SceneGate.Lemon.Titles;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
@@ -81,7 +82,7 @@ namespace SceneGate.Lemon.Containers.Converters
 
             WriteFile(writer, root.Children["certs_chain"]);
             WriteFile(writer, root.Children["ticket"]);
-            WriteFile(writer, root.Children["title"]);
+            WriteTitle(writer, root.Children["content"], root.Children["title"]);
             WriteContent(writer, root.Children["content"], root.Children["title"]);
             WriteFile(writer, root.Children["metadata"], false);
 
@@ -114,6 +115,178 @@ namespace SceneGate.Lemon.Containers.Converters
 
             file.Stream.WriteTo(writer.Stream);
             writer.WritePadding(0x00, BlockSize);
+        }
+
+        void WriteTitle(DataWriter writer, Node content, Node titleNode)
+        {
+            if (titleNode == null)
+                throw new FormatException("Missing game title");
+
+            var title = (TitleMetadata)ConvertFormat.With<Binary2TitleMetadata>(titleNode.Format);
+
+            var reader = new DataReader(titleNode.Stream) {
+                Endianness = EndiannessMode.BigEndian,
+            };
+
+            writer.Endianness = EndiannessMode.BigEndian;
+
+            writer.Write(title.SignType);
+            reader.Stream.Position = 4;
+            writer.Write(reader.ReadBytes(title.SignSize));
+            writer.Write(title.SignatureIssuer.PadRight(0x40, '\0'));
+            writer.Write(title.Version);
+            writer.Write(title.CaCrlVersion);
+            writer.Write(title.SignerCrlVersion);
+            writer.Write((byte)0x0);
+
+            writer.Write(title.SystemVersion);
+            writer.Write(title.TitleId);
+            writer.Write(title.TitleType);
+            writer.Write(title.GroupId);
+
+            writer.Write(title.SaveSize);
+            writer.Write(title.SrlPrivateSaveSize);
+            writer.Write(new byte[0x4]);
+
+            writer.Write(title.SrlFlag);
+            writer.Write(new byte[0x31]);
+
+            writer.Write(title.AccessRights);
+            writer.Write(title.TitleVersion);
+            writer.Write((short)title.Chunks.Count);
+            writer.Write((short)title.BootContent);
+            writer.Write(new byte[0x2]);
+
+            long hashContentInfoPosition = writer.Stream.Position;
+
+            // We'll write the content info records and its hash later
+            writer.Write(new byte[0x20]);
+            writer.Write(new byte[0x900]);
+
+            // Start writing the content chunk records into a stream so we can later hash it
+            int contentChunksSize = 0x30 * (short)title.Chunks.Count;
+            var contentChunksBytes = DataStreamFactory.FromArray(new byte[contentChunksSize], 0, contentChunksSize);
+
+            for (int i = 0; i < title.Chunks.Count; i++) {
+                string childName = title.Chunks[i].GetChunkName();
+                var child = content.Children[childName];
+                if (child is null)
+                    throw new FormatException($"Missing child: {childName}");
+                if (child.Format is not IBinary)
+                    throw new FormatException($"Cannot write child {childName} as it is not binary");
+
+                var chunksWriter = new DataWriter(contentChunksBytes) {
+                    Endianness = EndiannessMode.BigEndian,
+                };
+
+                var currentChunkReader = new DataReader(contentChunksBytes) {
+                    Endianness = EndiannessMode.BigEndian,
+                };
+
+                chunksWriter.Write(title.Chunks[i].Id);
+                chunksWriter.Write(title.Chunks[i].Index);
+                int attribute = (int)Enum.Parse(typeof(ContentAttributes), title.Chunks[i].Attributes.ToString());
+                chunksWriter.Write((short)attribute);
+                chunksWriter.Write(child.Stream.Length);
+                WriteSHA256(chunksWriter, child);
+
+                contentChunksBytes.Position -= 0x30;
+                writer.Write(currentChunkReader.ReadBytes(0x30));
+            }
+
+            long endOfChunksPosition = writer.Stream.Position;
+
+            var chunkReader = new DataReader(contentChunksBytes) {
+                Endianness = EndiannessMode.BigEndian,
+            };
+
+            chunkReader.Stream.Position = 0;
+
+            writer.Stream.Position = hashContentInfoPosition + 0x20;
+
+            // We'll start reading the original TMD data to get the content info records data
+            reader.Stream.Position += 0xC4;
+
+            // As with the content chunk records, we'll be write this first as a separate binary to later calculate the hash on
+            var contentInfoRecords = new BinaryFormat();
+            var contentInfoRecordsWriter = new DataWriter(contentInfoRecords.Stream) {
+                Endianness = EndiannessMode.BigEndian,
+            };
+
+            int chunksHashed = 0;
+            for (int infoRecord = 0; infoRecord < 64; infoRecord++) {
+                contentInfoRecordsWriter.Write(reader.ReadInt16());
+
+                // This short will say how much chunk records needs to be hashed (if they haven't already)
+                short contentCommandCount = reader.ReadInt16();
+                contentInfoRecordsWriter.Write(contentCommandCount);
+
+                if (contentCommandCount > 0) {
+                    var chunksToHash = DataStreamFactory.FromArray(new byte[0x30 * (contentCommandCount + chunksHashed)], 0, 0x30 * (contentCommandCount + chunksHashed));
+                    for (int i = 0; i < contentCommandCount; i++) {
+                        var chunkWriter = new DataWriter(chunksToHash) {
+                            Endianness = EndiannessMode.BigEndian,
+                        };
+
+                        chunkWriter.Write(chunkReader.ReadBytes(0x30));
+                    }
+
+                    WriteSHA256Stream(contentInfoRecordsWriter, chunksToHash);
+                }
+                else {
+                    contentInfoRecordsWriter.Write(new byte[0x20]);
+                }
+
+                chunksHashed += contentCommandCount;
+                reader.Stream.Position += 0x20;
+            }
+
+            var contentInfoRecordsReader = new DataReader(contentInfoRecords.Stream) {
+                Endianness = EndiannessMode.BigEndian,
+            };
+
+            contentInfoRecordsReader.Stream.Position = 0;
+
+            writer.Write(contentInfoRecordsReader.ReadBytes((int)contentInfoRecords.Stream.Length));
+
+            writer.Stream.Position = hashContentInfoPosition;
+            WriteSHA256Stream(writer, contentInfoRecords.Stream);
+
+            writer.Stream.Position = endOfChunksPosition;
+
+            writer.Write(new byte[0x1c]);
+            writer.Endianness = EndiannessMode.LittleEndian;
+        }
+
+        void WriteSHA256(DataWriter writer, Node file)
+        {
+            using (SHA256 sha256 = SHA256.Create()) {
+                try {
+                    if (file == null) {
+                        writer.Write(new byte[0x20]);
+                        return;
+                    }
+
+                    file.Stream.Position = 0;
+
+                    writer.Write(sha256.ComputeHash(file.Stream));
+                } catch (Exception ex) {
+                    throw new FormatException(ex.Message);
+                }
+            }
+        }
+
+        void WriteSHA256Stream(DataWriter writer, DataStream stream)
+        {
+            using (SHA256 sha256 = SHA256.Create()) {
+                try {
+                    stream.Position = 0;
+
+                    writer.Write(sha256.ComputeHash(stream));
+                } catch (Exception ex) {
+                    throw new FormatException(ex.Message);
+                }
+            }
         }
 
         void WriteContent(DataWriter writer, Node content, Node titleNode)
