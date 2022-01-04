@@ -34,15 +34,15 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
     public class NcchConverterTests
     {
         readonly CaptureLogger logger;
-        int initialStreams;
-        BinaryFormat original;
-        IConverter<BinaryFormat, Ncch> containerConverter;
-        IConverter<Ncch, BinaryFormat> binaryConverter;
-
         readonly string yamlPath;
         readonly string binaryPath;
         readonly int offset;
         readonly int size;
+
+        int initialStreams;
+        BinaryFormat original;
+        IConverter<BinaryFormat, Ncch> containerConverter;
+        IConverter<Ncch, BinaryFormat> binaryConverter;
 
         NcchTestInfo expected;
 
@@ -126,13 +126,13 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
             return new BinaryFormat(stream);
         }
 
-        public void ValidateHeader(Ncch actual)
+        protected void ValidateHeader(Ncch actual)
         {
             var header = actual.Header;
             Assert.That(header.Signature, Has.Length.EqualTo(expected.SignatureLength));
         }
 
-        public void ValidateRegions(Ncch actual)
+        protected void ValidateRegions(Ncch actual)
         {
             Assert.That(
                 actual.Root.Children,
