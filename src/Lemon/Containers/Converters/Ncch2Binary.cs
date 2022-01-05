@@ -26,6 +26,7 @@ namespace SceneGate.Lemon.Containers.Converters
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Security.Cryptography;
     using SceneGate.Lemon.Containers.Formats;
     using Yarhl.FileFormat;
@@ -162,8 +163,11 @@ namespace SceneGate.Lemon.Containers.Converters
                 int fileLengthInUnits = fileLength / NcchHeader.Unit;
 
                 bool usedChunk = false;
+                var fileRange = Enumerable.Range(offset, fileLength);
                 foreach (var usedUnit in usedUnits) {
-                    if (usedUnit.Key <= offset && offset <= (usedUnit.Key + usedUnit.Value)) {
+                    var usedRange = Enumerable.Range(usedUnit.Key, usedUnit.Value);
+
+                    if (fileRange.Intersect(usedRange).Any()) {
                         usedChunk = true;
                     }
                 }
