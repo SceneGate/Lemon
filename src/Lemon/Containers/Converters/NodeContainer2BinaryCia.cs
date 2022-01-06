@@ -78,11 +78,25 @@ namespace SceneGate.Lemon.Containers.Converters
             };
 
             Node root = source.Root;
+
+            var title = root.Children["title"].GetFormatAs<TitleMetadata>();
+            UpdateTitleMetadata(title, root.Children["content"]);
+
+            var binaryConverter = new TitleMetadata2Binary();
+            var binaryTitle = binaryConverter.Convert(title);
+            root.Children["title"].ChangeFormat(binaryTitle);
+
             WriteHeader(writer, root);
 
             WriteFile(writer, root.Children["certs_chain"]);
             WriteFile(writer, root.Children["ticket"]);
-            WriteTitle(writer, root.Children["content"], root.Children["title"]);
+
+            writer.Endianness = EndiannessMode.BigEndian;
+            binaryTitle.Stream.WriteTo(writer.Stream);
+            writer.Endianness = EndiannessMode.LittleEndian;
+
+            writer.Write(new byte[0x1c]);
+
             WriteContent(writer, root.Children["content"], root.Children["title"]);
             WriteFile(writer, root.Children["metadata"], false);
 
@@ -117,57 +131,17 @@ namespace SceneGate.Lemon.Containers.Converters
             writer.WritePadding(0x00, BlockSize);
         }
 
-        void WriteTitle(DataWriter writer, Node content, Node titleNode)
+        void UpdateTitleMetadata(TitleMetadata title, Node content)
         {
-            if (titleNode == null)
-                throw new FormatException("Missing game title");
-
-            var title = (TitleMetadata)ConvertFormat.With<Binary2TitleMetadata>(titleNode.Format);
-
-            var reader = new DataReader(titleNode.Stream) {
+            int chunksHashed = 0;
+            var infoRecords = new DataStream();
+            var infoRecordsWriter = new DataWriter(infoRecords) {
                 Endianness = EndiannessMode.BigEndian,
             };
 
-            writer.Endianness = EndiannessMode.BigEndian;
-
-            writer.Write(title.SignType);
-            reader.Stream.Position = 4;
-            writer.Write(reader.ReadBytes(title.SignSize));
-            writer.Write(title.SignatureIssuer.PadRight(0x40, '\0'));
-            writer.Write(title.Version);
-            writer.Write(title.CaCrlVersion);
-            writer.Write(title.SignerCrlVersion);
-            writer.Write((byte)0x0);
-
-            writer.Write(title.SystemVersion);
-            writer.Write(title.TitleId);
-            writer.Write(title.TitleType);
-            writer.Write(title.GroupId);
-
-            writer.Write(title.SaveSize);
-            writer.Write(title.SrlPrivateSaveSize);
-            writer.Write(new byte[0x4]);
-
-            writer.Write(title.SrlFlag);
-            writer.Write(new byte[0x31]);
-
-            writer.Write(title.AccessRights);
-            writer.Write(title.TitleVersion);
-            writer.Write((short)title.Chunks.Count);
-            writer.Write((short)title.BootContent);
-            writer.Write(new byte[0x2]);
-
-            long hashContentInfoPosition = writer.Stream.Position;
-
-            // We'll write the content info records and its hash later
-            writer.Write(new byte[0x20]);
-            writer.Write(new byte[0x900]);
-
-            // Start writing the content chunk records into a stream so we can later hash it
-            int contentChunksSize = 0x30 * (short)title.Chunks.Count;
-            var contentChunksBytes = DataStreamFactory.FromArray(new byte[contentChunksSize], 0, contentChunksSize);
-
             for (int i = 0; i < title.Chunks.Count; i++) {
+                var chunk = title.Chunks[i];
+
                 string childName = title.Chunks[i].GetChunkName();
                 var child = content.Children[childName];
                 if (child is null)
@@ -175,116 +149,55 @@ namespace SceneGate.Lemon.Containers.Converters
                 if (child.Format is not IBinary)
                     throw new FormatException($"Cannot write child {childName} as it is not binary");
 
-                var chunksWriter = new DataWriter(contentChunksBytes) {
+                chunk.Size = child.Stream.Length;
+                chunk.Hash = SHA256FromStream(child.Stream);
+            }
+
+            for (int i = 0; i < title.InfoRecords.Count; i++) {
+                if (title.InfoRecords[i].IsEmpty) {
+                    infoRecordsWriter.Write(new byte[0x24]);
+                    continue;
+                }
+
+                var infoRecord = title.InfoRecords[i];
+
+                var chunksToHash = new DataStream();
+                var chunksToHashWriter = new DataWriter(chunksToHash) {
                     Endianness = EndiannessMode.BigEndian,
                 };
 
-                var currentChunkReader = new DataReader(contentChunksBytes) {
-                    Endianness = EndiannessMode.BigEndian,
-                };
+                for (int k = 0; k < infoRecord.CommandCount; k++) {
+                    var chunk = title.Chunks[k + chunksHashed];
 
-                chunksWriter.Write(title.Chunks[i].Id);
-                chunksWriter.Write(title.Chunks[i].Index);
-                int attribute = (int)Enum.Parse(typeof(ContentAttributes), title.Chunks[i].Attributes.ToString());
-                chunksWriter.Write((short)attribute);
-                chunksWriter.Write(child.Stream.Length);
-                WriteSHA256(chunksWriter, child);
+                    chunksToHashWriter.Write(chunk.Id);
+                    chunksToHashWriter.Write(chunk.Index);
 
-                contentChunksBytes.Position -= 0x30;
-                writer.Write(currentChunkReader.ReadBytes(0x30));
-            }
+                    int attribute = (int)Enum.Parse(typeof(ContentAttributes), chunk.Attributes.ToString());
+                    chunksToHashWriter.Write((short)attribute);
 
-            long endOfChunksPosition = writer.Stream.Position;
-
-            var chunkReader = new DataReader(contentChunksBytes) {
-                Endianness = EndiannessMode.BigEndian,
-            };
-
-            chunkReader.Stream.Position = 0;
-
-            writer.Stream.Position = hashContentInfoPosition + 0x20;
-
-            // We'll start reading the original TMD data to get the content info records data
-            reader.Stream.Position += 0xC4;
-
-            // As with the content chunk records, we'll be write this first as a separate binary to later calculate the hash on
-            var contentInfoRecords = new BinaryFormat();
-            var contentInfoRecordsWriter = new DataWriter(contentInfoRecords.Stream) {
-                Endianness = EndiannessMode.BigEndian,
-            };
-
-            int chunksHashed = 0;
-            for (int infoRecord = 0; infoRecord < 64; infoRecord++) {
-                contentInfoRecordsWriter.Write(reader.ReadInt16());
-
-                // This short will say how much chunk records needs to be hashed (if they haven't already)
-                short contentCommandCount = reader.ReadInt16();
-                contentInfoRecordsWriter.Write(contentCommandCount);
-
-                if (contentCommandCount > 0) {
-                    var chunksToHash = DataStreamFactory.FromArray(new byte[0x30 * (contentCommandCount + chunksHashed)], 0, 0x30 * (contentCommandCount + chunksHashed));
-                    for (int i = 0; i < contentCommandCount; i++) {
-                        var chunkWriter = new DataWriter(chunksToHash) {
-                            Endianness = EndiannessMode.BigEndian,
-                        };
-
-                        chunkWriter.Write(chunkReader.ReadBytes(0x30));
-                    }
-
-                    WriteSHA256Stream(contentInfoRecordsWriter, chunksToHash);
-                }
-                else {
-                    contentInfoRecordsWriter.Write(new byte[0x20]);
+                    chunksToHashWriter.Write(chunk.Size);
+                    chunksToHashWriter.Write(chunk.Hash);
                 }
 
-                chunksHashed += contentCommandCount;
-                reader.Stream.Position += 0x20;
+                infoRecord.Hash = SHA256FromStream(chunksToHash);
+                chunksHashed += infoRecord.CommandCount;
+
+                infoRecordsWriter.Write(infoRecord.IndexOffset);
+                infoRecordsWriter.Write(infoRecord.CommandCount);
+                infoRecordsWriter.Write(infoRecord.Hash);
             }
 
-            var contentInfoRecordsReader = new DataReader(contentInfoRecords.Stream) {
-                Endianness = EndiannessMode.BigEndian,
-            };
-
-            contentInfoRecordsReader.Stream.Position = 0;
-
-            writer.Write(contentInfoRecordsReader.ReadBytes((int)contentInfoRecords.Stream.Length));
-
-            writer.Stream.Position = hashContentInfoPosition;
-            WriteSHA256Stream(writer, contentInfoRecords.Stream);
-
-            writer.Stream.Position = endOfChunksPosition;
-
-            writer.Write(new byte[0x1c]);
-            writer.Endianness = EndiannessMode.LittleEndian;
+            title.Hash = SHA256FromStream(infoRecords);
         }
 
-        void WriteSHA256(DataWriter writer, Node file)
-        {
-            using (SHA256 sha256 = SHA256.Create()) {
-                try {
-                    if (file == null) {
-                        writer.Write(new byte[0x20]);
-                        return;
-                    }
-
-                    file.Stream.Position = 0;
-
-                    writer.Write(sha256.ComputeHash(file.Stream));
-                } catch (Exception ex) {
-                    throw new FormatException(ex.Message);
-                }
-            }
-        }
-
-        void WriteSHA256Stream(DataWriter writer, DataStream stream)
+        byte[] SHA256FromStream(DataStream stream)
         {
             using (SHA256 sha256 = SHA256.Create()) {
                 try {
                     stream.Position = 0;
-
-                    writer.Write(sha256.ComputeHash(stream));
+                    return sha256.ComputeHash(stream);
                 } catch (Exception ex) {
-                    throw new FormatException(ex.Message);
+                    throw new FormatException($"Failed to perform SHA256 during TMD update", ex);
                 }
             }
         }

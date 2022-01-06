@@ -32,6 +32,7 @@ namespace SceneGate.Lemon.Titles
         /// </summary>
         public TitleMetadata()
         {
+            InfoRecords = new Collection<ContentInfoRecord>();
             Chunks = new Collection<ContentChunkRecord>();
         }
 
@@ -41,9 +42,9 @@ namespace SceneGate.Lemon.Titles
         public uint SignType { get; set; }
 
         /// <summary>
-        /// Gets or sets the signature size.
+        /// Gets or sets the signature.
         /// </summary>
-        public int SignSize { get; set; }
+        public byte[] Signature { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the title metadata has a
@@ -120,6 +121,16 @@ namespace SceneGate.Lemon.Titles
         /// Gets or sets the index of the bootable content.
         /// </summary>
         public int BootContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets the hash of the Content Info Records.
+        /// </summary>
+        public byte[] Hash { get; set; }
+
+        /// <summary>
+        /// Gets a collection of content info records.
+        /// </summary>
+        public Collection<ContentInfoRecord> InfoRecords { get; private set; }
 
         /// <summary>
         /// Gets a collection of content chunks.

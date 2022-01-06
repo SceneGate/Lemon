@@ -1,4 +1,4 @@
-// Copyright (c) 2020 SceneGate
+﻿// Copyright (c) 2020 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,6 +74,8 @@ namespace SceneGate.Lemon.Containers.Converters
 
             long contentOffset = (tmdOffset + header.TitleMetaLength).Pad(BlockSize);
             Node content = UnpackContent(title, stream, contentOffset);
+
+            title = title.TransformWith<Binary2TitleMetadata>();
 
             long metaOffset = (contentOffset + header.ContentLength).Pad(BlockSize);
             Node metadata = NodeFactory.FromSubstream(

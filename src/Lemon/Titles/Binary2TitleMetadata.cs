@@ -29,7 +29,6 @@ namespace SceneGate.Lemon.Titles
     public class Binary2TitleMetadata : IConverter<BinaryFormat, TitleMetadata>
     {
         const int NumContentInfo = 64;
-        const int InfoRecordSize = 0x24;
 
         /// <summary>
         /// Converts a binary format into a title metadata object.
@@ -52,13 +51,14 @@ namespace SceneGate.Lemon.Titles
             uint signType = reader.ReadUInt32();
             metadata.SignType = signType;
             int signSize = GetSignatureSize(signType);
-            metadata.SignSize = signSize;
-            source.Stream.Position += signSize;
+            metadata.Signature = reader.ReadBytes(signSize);
 
             metadata = ReadHeader(reader, out int contentCount, metadata);
 
-            // TODO: Validate chunk records
-            source.Stream.Position += NumContentInfo * InfoRecordSize;
+            for (int i = 0; i < NumContentInfo; i++) {
+                ContentInfoRecord infoRecord = ReadInfoRecord(reader);
+                metadata.InfoRecords.Add(infoRecord);
+            }
 
             for (int i = 0; i < contentCount; i++) {
                 ContentChunkRecord chunk = ReadChunkRecord(reader);
@@ -110,6 +110,29 @@ namespace SceneGate.Lemon.Titles
             };
 
             return chunk;
+        }
+
+        static ContentInfoRecord ReadInfoRecord(DataReader reader)
+        {
+            var infoRecord = new ContentInfoRecord {
+                IndexOffset = reader.ReadInt16(),
+                CommandCount = reader.ReadInt16(),
+                Hash = reader.ReadBytes(0x20),
+                IsEmpty = false, // This exists if for some reason there's a TMD which has an empty record followed by a populated one.
+            };
+
+            bool hashIsEmpty = true;
+            for (int i = 0; i < infoRecord.Hash.Length; i++) {
+                if (infoRecord.Hash[i] != 0) {
+                    hashIsEmpty = false;
+                }
+            }
+
+            if (infoRecord.IndexOffset == 0 && infoRecord.CommandCount == 0 && hashIsEmpty) {
+                infoRecord.IsEmpty = true;
+            }
+
+            return infoRecord;
         }
 
         static int GetSignatureSize(uint type)
