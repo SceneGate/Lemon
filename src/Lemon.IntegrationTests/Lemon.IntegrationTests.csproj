@@ -6,7 +6,7 @@
     <AssemblyName>SceneGate.Lemon.IntegrationTests</AssemblyName>
     <RootNamespace>SceneGate.Lemon.IntegrationTests</RootNamespace>
     <Description>Integration tests for Lemon.</Description>
-    <TargetFrameworks>net5.0</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

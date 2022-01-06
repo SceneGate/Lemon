@@ -139,10 +139,10 @@ namespace SceneGate.Lemon.Containers.Converters
             }
 
             // Update header values
-            ((DataStream)writer.Stream).PushToPosition(0x18);
+            writer.Stream.PushToPosition(0x18);
             writer.Write(contentSize);
             writer.Write(contentBitset);
-            ((DataStream)writer.Stream).PopPosition();
+            writer.Stream.PopPosition();
         }
     }
 }
