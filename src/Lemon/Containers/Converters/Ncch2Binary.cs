@@ -25,8 +25,6 @@
 namespace SceneGate.Lemon.Containers.Converters
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Security.Cryptography;
     using SceneGate.Lemon.Containers.Formats;
     using Yarhl.FileFormat;
@@ -47,7 +45,6 @@ namespace SceneGate.Lemon.Containers.Converters
     public class Ncch2Binary :
         IConverter<Ncch, BinaryFormat>
     {
-        readonly Dictionary<int, int> usedUnits = new Dictionary<int, int>();
         DataStream stream;
 
         /// <summary>
@@ -120,12 +117,12 @@ namespace SceneGate.Lemon.Containers.Converters
             WriteFile(writer, root.Children["access_descriptor"], false);
 
             writer.Stream.Position = 0x190;
-            WriteOffsetSizeAndData(writer, root.Children["sdk_info.txt"], source.Header.SdkInfoOffset);
-            WriteOffsetSizeAndData(writer, root.Children["logo.bin"], source.Header.LogoOffset);
-            WriteOffsetSizeAndData(writer, root.Children["system"], source.Header.SystemOffset, source.Header.SystemHashSize, true);
+            WriteOffsetSizeAndData(writer, root.Children["sdk_info.txt"]);
+            WriteOffsetSizeAndData(writer, root.Children["logo.bin"]);
+            WriteOffsetSizeAndData(writer, root.Children["system"], source.Header.SystemHashSize, true);
 
             writer.Stream.Position += 0x4; // Reserved
-            WriteOffsetSizeAndData(writer, root.Children["rom"], source.Header.RomOffset, source.Header.RomHashSize, true);
+            WriteOffsetSizeAndData(writer, root.Children["rom"], source.Header.RomHashSize, true);
 
             writer.Stream.Position += 0x4; // Reserved
 
@@ -158,58 +155,21 @@ namespace SceneGate.Lemon.Containers.Converters
             file.Stream.WriteTo(writer.Stream);
         }
 
-        void WriteOffsetSizeAndData(DataWriter writer, Node file, int offsetInUnits, int hashRegion = 0, bool hasHashRegion = false)
+        void WriteOffsetSizeAndData(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
         {
             if (file != null) {
                 long position = writer.Stream.Position;
-                int offset = offsetInUnits * NcchHeader.Unit;
+                int offsetInUnits = (int)writer.Stream.Length / NcchHeader.Unit;
                 int fileLength = (int)file.Stream.Length.Pad(NcchHeader.Unit);
                 int fileLengthInUnits = fileLength / NcchHeader.Unit;
-
-                bool usedChunk = false;
-                var fileRange = Enumerable.Range(offset, fileLength);
-                foreach (var usedUnit in usedUnits) {
-                    var usedRange = Enumerable.Range(usedUnit.Key, usedUnit.Value);
-
-                    if (fileRange.Intersect(usedRange).Any()) {
-                        usedChunk = true;
-                    }
-                }
-
-                if (writer.Stream.Length > offset && usedChunk) {
-                    if (writer.Stream.Length % NcchHeader.Unit != 0) {
-                        long tempPosition = writer.Stream.Position;
-
-                        writer.Stream.Position = writer.Stream.Length;
-                        writer.WritePadding(0, NcchHeader.Unit);
-
-                        writer.Stream.Position = tempPosition;
-                    }
-
-                    offset = (int)writer.Stream.Length;
-                    offsetInUnits = offset / NcchHeader.Unit;
-                }
-
-                if (writer.Stream.Length < offset) {
-                    long tempPosition = writer.Stream.Position;
-
-                    writer.Stream.Position = writer.Stream.Length;
-                    writer.Write(new byte[offset - writer.Stream.Length]);
-                    writer.WritePadding(0, NcchHeader.Unit);
-
-                    writer.Stream.Position = tempPosition;
-                }
 
                 writer.Write(offsetInUnits);
                 writer.Write(fileLengthInUnits);
 
-                writer.Stream.Position = offset;
-
+                writer.Stream.Position = writer.Stream.Length;
                 file.Stream.WriteTo(writer.Stream);
 
                 writer.Stream.Position = position + 0x8;
-
-                usedUnits.Add(offset, fileLength);
             }
             else {
                 writer.Write(0);
