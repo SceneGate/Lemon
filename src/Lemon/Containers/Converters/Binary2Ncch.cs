@@ -81,23 +81,15 @@ namespace SceneGate.Lemon.Containers.Converters
 
             // Read the subfiles
             source.Stream.Position = 0x190;
-            header.SdkInfoOffset = reader.ReadInt32();
-            source.Stream.Position -= 0x04;
             AddChildIfExists("sdk_info.txt", ncch.Root, reader);
 
-            header.LogoOffset = reader.ReadInt32();
-            source.Stream.Position -= 0x04;
             AddChildIfExists("logo.bin", ncch.Root, reader);
 
-            header.SystemOffset = reader.ReadInt32();
-            source.Stream.Position -= 0x04;
             AddChildIfExists("system", ncch.Root, reader);
 
             header.SystemHashSize = reader.ReadInt32();
             source.Stream.Position += 4; // Reserved
 
-            header.RomOffset = reader.ReadInt32();
-            source.Stream.Position -= 0x04;
             AddChildIfExists("rom", ncch.Root, reader);
 
             header.RomHashSize = reader.ReadInt32();
