@@ -168,6 +168,7 @@ namespace SceneGate.Lemon.Containers.Converters
 
                 writer.Stream.Position = writer.Stream.Length;
                 file.Stream.WriteTo(writer.Stream);
+                writer.WritePadding(0, NcchHeader.Unit);
 
                 writer.Stream.Position = position + 0x8;
             }
