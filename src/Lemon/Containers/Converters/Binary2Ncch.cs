@@ -46,6 +46,7 @@ namespace SceneGate.Lemon.Containers.Converters
 
             var ncch = new Ncch();
             var reader = new DataReader(source.Stream);
+            reader.Stream.Position = 0;
 
             // First read the header
             var header = ncch.Header;

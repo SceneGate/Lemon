@@ -132,6 +132,10 @@ namespace SceneGate.Lemon.Containers.Converters
             WriteSHA256(writer, root.Children["system"], source.Header.SystemHashSize, true);
             WriteSHA256(writer, root.Children["rom"], source.Header.RomHashSize, true);
 
+            // Write padding at the end of the binary to prevent having a wrong size in units
+            writer.Stream.Position = writer.Stream.Length;
+            writer.WritePadding(0, NcchHeader.Unit);
+
             // Write the full size of the binary (in units) in 0x104
             writer.Stream.Position = 0x104;
             writer.Write((int)writer.Stream.Length / NcchHeader.Unit);
@@ -159,7 +163,7 @@ namespace SceneGate.Lemon.Containers.Converters
             if (file != null) {
                 long position = writer.Stream.Position;
                 int offset = offsetInUnits * NcchHeader.Unit;
-                int fileLength = (int)file.Stream.Length;
+                int fileLength = (int)file.Stream.Length.Pad(NcchHeader.Unit);
                 int fileLengthInUnits = fileLength / NcchHeader.Unit;
 
                 bool usedChunk = false;
@@ -173,7 +177,16 @@ namespace SceneGate.Lemon.Containers.Converters
                 }
 
                 if (writer.Stream.Length > offset && usedChunk) {
-                    offset = (int)Math.Ceiling((double)writer.Stream.Length / NcchHeader.Unit) * NcchHeader.Unit;
+                    if (writer.Stream.Length % NcchHeader.Unit != 0) {
+                        long tempPosition = writer.Stream.Position;
+
+                        writer.Stream.Position = writer.Stream.Length;
+                        writer.WritePadding(0, NcchHeader.Unit);
+
+                        writer.Stream.Position = tempPosition;
+                    }
+
+                    offset = (int)writer.Stream.Length;
                     offsetInUnits = offset / NcchHeader.Unit;
                 }
 
@@ -182,6 +195,7 @@ namespace SceneGate.Lemon.Containers.Converters
 
                     writer.Stream.Position = writer.Stream.Length;
                     writer.Write(new byte[offset - writer.Stream.Length]);
+                    writer.WritePadding(0, NcchHeader.Unit);
 
                     writer.Stream.Position = tempPosition;
                 }
@@ -229,7 +243,7 @@ namespace SceneGate.Lemon.Containers.Converters
                         writer.Write(sha256.ComputeHash(file.Stream));
                     }
                 } catch (Exception ex) {
-                    throw new FormatException(ex.Message);
+                    throw new FormatException($"Failed to perform SHA256 for {file.Name}", ex);
                 }
             }
         }

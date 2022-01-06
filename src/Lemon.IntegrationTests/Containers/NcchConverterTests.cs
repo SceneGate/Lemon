@@ -94,29 +94,22 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
         }
 
         [Test]
-        public void TransformToContainer()
-        {
-            // Check header and regions are expected
-            using var actual = containerConverter.Convert(original);
-            ValidateHeader(actual);
-            ValidateRegions(actual);
-
-            // Check everything is virtual node (only the binary stream)
-            Assert.That(DataStream.ActiveStreams, Is.EqualTo(initialStreams + 1));
-            Assert.That(logger.IsEmpty, Is.True);
-        }
-
-        [Test]
-        public void TransformBothWays()
+        public void TransformThreeWays()
         {
             if (binaryConverter == null) {
                 Assert.Ignore();
             }
 
+            // Convert the binary to NCCH, and check the original header and regions are expected
             using var actual = containerConverter.Convert(original);
-            using var actualBinary = binaryConverter.Convert(actual);
+            ValidateHeader(actual);
+            ValidateRegions(actual, true);
 
-            Assert.That(original.Stream.Compare(actualBinary.Stream), Is.True, "Streams are not identical");
+            // Convert the new NCCH to binary (and vice-versa), and check the header and regions lengths are expected
+            using var generatedBinary = binaryConverter.Convert(actual);
+            using var generatedNcch = containerConverter.Convert(generatedBinary);
+            ValidateHeader(generatedNcch);
+            ValidateRegions(generatedNcch, false);
         }
 
         protected BinaryFormat GetBinary(int offset, int size)
@@ -132,7 +125,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
             Assert.That(header.Signature, Has.Length.EqualTo(expected.SignatureLength));
         }
 
-        protected void ValidateRegions(Ncch actual)
+        protected void ValidateRegions(Ncch actual, bool checkOffset)
         {
             Assert.That(
                 actual.Root.Children,
@@ -141,7 +134,10 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
             for (int i = 0; i < actual.Root.Children.Count; i++) {
                 var child = actual.Root.Children[i];
                 Assert.That(child.Name, Is.EqualTo(expected.AvailableRegions[i]));
-                Assert.That(child.Stream.Offset, Is.EqualTo(offset + expected.RegionsOffset[i]));
+                if (checkOffset) {
+                    Assert.That(child.Stream.Offset, Is.EqualTo(offset + expected.RegionsOffset[i]));
+                }
+
                 Assert.That(child.Stream.Length, Is.EqualTo(expected.RegionsSize[i]));
             }
         }
