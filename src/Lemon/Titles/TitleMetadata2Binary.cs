@@ -29,12 +29,12 @@ namespace SceneGate.Lemon.Titles
     using Yarhl.IO;
 
     /// <summary>
-    /// Convert a TitleMetadata instance into binary format.
+    /// Convert a TitleMetadata object into binary format.
     /// </summary>
     public class TitleMetadata2Binary : IConverter<TitleMetadata, BinaryFormat>
     {
         /// <summary>
-        /// Converts a binary format into a title metadata object.
+        /// Converts a title metadata object into a binary format.
         /// </summary>
         /// <param name="source">The source binary.</param>
         /// <returns>The deserializer title metadata.</returns>

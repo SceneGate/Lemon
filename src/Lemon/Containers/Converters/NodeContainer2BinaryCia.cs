@@ -79,6 +79,14 @@ namespace SceneGate.Lemon.Containers.Converters
 
             Node root = source.Root;
 
+            if (root.Children["title"].Format is IBinary) {
+                root.Children["title"].TransformWith<Binary2TitleMetadata>();
+            }
+
+            if (root.Children["title"].Format is not TitleMetadata) {
+                throw new FormatException("Unknown format for title node");
+            }
+
             var title = root.Children["title"].GetFormatAs<TitleMetadata>();
             UpdateTitleMetadata(title, root.Children["content"]);
 
@@ -95,7 +103,7 @@ namespace SceneGate.Lemon.Containers.Converters
             binaryTitle.Stream.WriteTo(writer.Stream);
             writer.Endianness = EndiannessMode.LittleEndian;
 
-            writer.Write(new byte[0x1c]);
+            writer.WritePadding(0x00, BlockSize);
 
             WriteContent(writer, root.Children["content"], root.Children["title"]);
             WriteFile(writer, root.Children["metadata"], false);
@@ -134,7 +142,7 @@ namespace SceneGate.Lemon.Containers.Converters
         void UpdateTitleMetadata(TitleMetadata title, Node content)
         {
             int chunksHashed = 0;
-            var infoRecords = new DataStream();
+            using var infoRecords = new DataStream();
             var infoRecordsWriter = new DataWriter(infoRecords) {
                 Endianness = EndiannessMode.BigEndian,
             };
@@ -161,7 +169,7 @@ namespace SceneGate.Lemon.Containers.Converters
 
                 var infoRecord = title.InfoRecords[i];
 
-                var chunksToHash = new DataStream();
+                using var chunksToHash = new DataStream();
                 var chunksToHashWriter = new DataWriter(chunksToHash) {
                     Endianness = EndiannessMode.BigEndian,
                 };

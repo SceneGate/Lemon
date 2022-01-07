@@ -75,8 +75,6 @@ namespace SceneGate.Lemon.Containers.Converters
             long contentOffset = (tmdOffset + header.TitleMetaLength).Pad(BlockSize);
             Node content = UnpackContent(title, stream, contentOffset);
 
-            title = title.TransformWith<Binary2TitleMetadata>();
-
             long metaOffset = (contentOffset + header.ContentLength).Pad(BlockSize);
             Node metadata = NodeFactory.FromSubstream(
                 "metadata",
