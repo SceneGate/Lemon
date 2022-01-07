@@ -1,4 +1,4 @@
-// Copyright (c) 2020 SceneGate
+﻿// Copyright (c) 2020 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ namespace SceneGate.Lemon.Titles
     public class Binary2TitleMetadata : IConverter<BinaryFormat, TitleMetadata>
     {
         const int NumContentInfo = 64;
-        const int InfoRecordSize = 0x24;
 
         /// <summary>
         /// Converts a binary format into a title metadata object.
@@ -46,15 +45,20 @@ namespace SceneGate.Lemon.Titles
                 Endianness = EndiannessMode.BigEndian,
             };
 
+            TitleMetadata metadata = new TitleMetadata();
+
             // TODO: Validate signature
             uint signType = reader.ReadUInt32();
+            metadata.SignType = signType;
             int signSize = GetSignatureSize(signType);
-            source.Stream.Position += signSize;
+            metadata.Signature = reader.ReadBytes(signSize);
 
-            TitleMetadata metadata = ReadHeader(reader, out int contentCount);
+            metadata = ReadHeader(reader, out int contentCount, metadata);
 
-            // TODO: Validate chunk records
-            source.Stream.Position += NumContentInfo * InfoRecordSize;
+            for (int i = 0; i < NumContentInfo; i++) {
+                ContentInfoRecord infoRecord = ReadInfoRecord(reader);
+                metadata.InfoRecords.Add(infoRecord);
+            }
 
             for (int i = 0; i < contentCount; i++) {
                 ContentChunkRecord chunk = ReadChunkRecord(reader);
@@ -64,9 +68,8 @@ namespace SceneGate.Lemon.Titles
             return metadata;
         }
 
-        static TitleMetadata ReadHeader(DataReader reader, out int contentCount)
+        static TitleMetadata ReadHeader(DataReader reader, out int contentCount, TitleMetadata metadata)
         {
-            var metadata = new TitleMetadata();
             metadata.SignatureIssuer = reader.ReadString(0x40).Replace("\0", string.Empty);
             metadata.Version = reader.ReadByte();
             metadata.CaCrlVersion = reader.ReadByte();
@@ -107,6 +110,29 @@ namespace SceneGate.Lemon.Titles
             };
 
             return chunk;
+        }
+
+        static ContentInfoRecord ReadInfoRecord(DataReader reader)
+        {
+            var infoRecord = new ContentInfoRecord {
+                IndexOffset = reader.ReadInt16(),
+                CommandCount = reader.ReadInt16(),
+                Hash = reader.ReadBytes(0x20),
+                IsEmpty = false, // This exists if for some reason there's a TMD which has an empty record followed by a populated one.
+            };
+
+            bool hashIsEmpty = true;
+            for (int i = 0; i < infoRecord.Hash.Length; i++) {
+                if (infoRecord.Hash[i] != 0) {
+                    hashIsEmpty = false;
+                }
+            }
+
+            if (infoRecord.IndexOffset == 0 && infoRecord.CommandCount == 0 && hashIsEmpty) {
+                infoRecord.IsEmpty = true;
+            }
+
+            return infoRecord;
         }
 
         static int GetSignatureSize(uint type)

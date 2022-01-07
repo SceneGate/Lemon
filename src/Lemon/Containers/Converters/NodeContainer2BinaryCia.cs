@@ -1,4 +1,4 @@
-// Copyright (c) 2020 SceneGate
+﻿// Copyright (c) 2020 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@
 namespace SceneGate.Lemon.Containers.Converters
 {
     using System;
+    using System.Security.Cryptography;
     using SceneGate.Lemon.Titles;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
@@ -77,11 +78,33 @@ namespace SceneGate.Lemon.Containers.Converters
             };
 
             Node root = source.Root;
+
+            if (root.Children["title"].Format is IBinary) {
+                root.Children["title"].TransformWith<Binary2TitleMetadata>();
+            }
+
+            if (root.Children["title"].Format is not TitleMetadata) {
+                throw new FormatException("Unknown format for title node");
+            }
+
+            var title = root.Children["title"].GetFormatAs<TitleMetadata>();
+            UpdateTitleMetadata(title, root.Children["content"]);
+
+            var binaryConverter = new TitleMetadata2Binary();
+            var binaryTitle = binaryConverter.Convert(title);
+            root.Children["title"].ChangeFormat(binaryTitle);
+
             WriteHeader(writer, root);
 
             WriteFile(writer, root.Children["certs_chain"]);
             WriteFile(writer, root.Children["ticket"]);
-            WriteFile(writer, root.Children["title"]);
+
+            writer.Endianness = EndiannessMode.BigEndian;
+            binaryTitle.Stream.WriteTo(writer.Stream);
+            writer.Endianness = EndiannessMode.LittleEndian;
+
+            writer.WritePadding(0x00, BlockSize);
+
             WriteContent(writer, root.Children["content"], root.Children["title"]);
             WriteFile(writer, root.Children["metadata"], false);
 
@@ -114,6 +137,77 @@ namespace SceneGate.Lemon.Containers.Converters
 
             file.Stream.WriteTo(writer.Stream);
             writer.WritePadding(0x00, BlockSize);
+        }
+
+        void UpdateTitleMetadata(TitleMetadata title, Node content)
+        {
+            int chunksHashed = 0;
+            using var infoRecords = new DataStream();
+            var infoRecordsWriter = new DataWriter(infoRecords) {
+                Endianness = EndiannessMode.BigEndian,
+            };
+
+            for (int i = 0; i < title.Chunks.Count; i++) {
+                var chunk = title.Chunks[i];
+
+                string childName = title.Chunks[i].GetChunkName();
+                var child = content.Children[childName];
+                if (child is null)
+                    throw new FormatException($"Missing child: {childName}");
+                if (child.Format is not IBinary)
+                    throw new FormatException($"Cannot write child {childName} as it is not binary");
+
+                chunk.Size = child.Stream.Length;
+                chunk.Hash = SHA256FromStream(child.Stream);
+            }
+
+            for (int i = 0; i < title.InfoRecords.Count; i++) {
+                if (title.InfoRecords[i].IsEmpty) {
+                    infoRecordsWriter.Write(new byte[0x24]);
+                    continue;
+                }
+
+                var infoRecord = title.InfoRecords[i];
+
+                using var chunksToHash = new DataStream();
+                var chunksToHashWriter = new DataWriter(chunksToHash) {
+                    Endianness = EndiannessMode.BigEndian,
+                };
+
+                for (int k = 0; k < infoRecord.CommandCount; k++) {
+                    var chunk = title.Chunks[k + chunksHashed];
+
+                    chunksToHashWriter.Write(chunk.Id);
+                    chunksToHashWriter.Write(chunk.Index);
+
+                    int attribute = (int)Enum.Parse(typeof(ContentAttributes), chunk.Attributes.ToString());
+                    chunksToHashWriter.Write((short)attribute);
+
+                    chunksToHashWriter.Write(chunk.Size);
+                    chunksToHashWriter.Write(chunk.Hash);
+                }
+
+                infoRecord.Hash = SHA256FromStream(chunksToHash);
+                chunksHashed += infoRecord.CommandCount;
+
+                infoRecordsWriter.Write(infoRecord.IndexOffset);
+                infoRecordsWriter.Write(infoRecord.CommandCount);
+                infoRecordsWriter.Write(infoRecord.Hash);
+            }
+
+            title.Hash = SHA256FromStream(infoRecords);
+        }
+
+        byte[] SHA256FromStream(DataStream stream)
+        {
+            using (SHA256 sha256 = SHA256.Create()) {
+                try {
+                    stream.Position = 0;
+                    return sha256.ComputeHash(stream);
+                } catch (Exception ex) {
+                    throw new FormatException($"Failed to perform SHA256 during TMD update", ex);
+                }
+            }
         }
 
         void WriteContent(DataWriter writer, Node content, Node titleNode)
