@@ -24,7 +24,6 @@
 // THE SOFTWARE.
 namespace SceneGate.Lemon.Titles
 {
-    using System;
     using Yarhl.FileFormat;
     using Yarhl.IO;
 
@@ -36,8 +35,8 @@ namespace SceneGate.Lemon.Titles
         /// <summary>
         /// Converts a title metadata object into a binary format.
         /// </summary>
-        /// <param name="source">The source binary.</param>
-        /// <returns>The deserializer title metadata.</returns>
+        /// <param name="source">The object to serialize.</param>
+        /// <returns>The serialized title metadata.</returns>
         public BinaryFormat Convert(TitleMetadata source)
         {
             var binary = new BinaryFormat();
@@ -47,7 +46,7 @@ namespace SceneGate.Lemon.Titles
 
             writer.Write(source.SignType);
             writer.Write(source.Signature);
-            writer.Write(source.SignatureIssuer.PadRight(0x40, '\0'));
+            writer.Write(source.SignatureIssuer, 0x40);
             writer.Write(source.Version);
             writer.Write(source.CaCrlVersion);
             writer.Write(source.SignerCrlVersion);
@@ -59,7 +58,7 @@ namespace SceneGate.Lemon.Titles
             writer.Write(source.GroupId);
             writer.Write(source.SaveSize);
             writer.Write(source.SrlPrivateSaveSize);
-            writer.Write(new byte[0x4]); // Reserved
+            writer.Write(0); // Reserved
 
             writer.Write(source.SrlFlag);
             writer.Write(new byte[0x31]); // Reserved
@@ -68,13 +67,17 @@ namespace SceneGate.Lemon.Titles
             writer.Write(source.TitleVersion);
             writer.Write((short)source.Chunks.Count);
             writer.Write((short)source.BootContent);
-            writer.Write(new byte[0x2]); // Padding
+            writer.Write((short)0); // Padding
 
             writer.Write(source.Hash);
 
-            for (int i = 0; i < source.InfoRecords.Count; i++) {
-                var infoRecord = source.InfoRecords[i];
+            for (int i = 0; i < 64; i++) {
+                if (i >= source.InfoRecords.Count) {
+                    writer.Write(new byte[24]);
+                    continue;
+                }
 
+                var infoRecord = source.InfoRecords[i];
                 writer.Write(infoRecord.IndexOffset);
                 writer.Write(infoRecord.CommandCount);
                 writer.Write(infoRecord.Hash);
@@ -86,8 +89,7 @@ namespace SceneGate.Lemon.Titles
                 writer.Write(chunk.Id);
                 writer.Write(chunk.Index);
 
-                int attribute = (int)Enum.Parse(typeof(ContentAttributes), chunk.Attributes.ToString());
-                writer.Write((short)attribute);
+                writer.Write((short)chunk.Attributes);
 
                 writer.Write(chunk.Size);
                 writer.Write(chunk.Hash);

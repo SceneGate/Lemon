@@ -2,4 +2,4 @@
 # fake_exefs.yml,fake.ncsd,17920,512
 
 # Optionals not committed
-aofm_ivfc.yml,aofm.3ds,1191936,184934400
+aofm_ivfc.yml,aofm.cia,1190208,184934400

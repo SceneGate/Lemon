@@ -43,7 +43,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 
         protected override BinaryFormat GetBinary()
         {
-            TestContext.WriteLine(Path.GetFileName(binaryPath));
+            TestContext.WriteLine($"{nameof(CiaConverterTests)}: {Path.GetFileName(binaryPath)}");
             var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read);
             return new BinaryFormat(stream);
         }

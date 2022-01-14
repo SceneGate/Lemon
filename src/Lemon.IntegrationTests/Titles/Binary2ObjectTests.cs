@@ -19,9 +19,8 @@
 // SOFTWARE.
 namespace SceneGate.Lemon.IntegrationTests.Titles
 {
+    using FluentAssertions;
     using NUnit.Framework;
-    using YamlDotNet.Serialization;
-    using YamlDotNet.Serialization.NamingConventions;
     using Yarhl.FileFormat;
     using Yarhl.IO;
 
@@ -30,14 +29,14 @@ namespace SceneGate.Lemon.IntegrationTests.Titles
     {
         int initialStreams;
         BinaryFormat original;
-        string expectedYaml;
+        T expected;
         IConverter<BinaryFormat, T> objectConverter;
         IConverter<T, BinaryFormat> binaryConverter;
 
         [OneTimeSetUp]
         public void SetUpFixture()
         {
-            expectedYaml = GetObjectYaml();
+            expected = GetObject();
             objectConverter = GetToObjectConverter();
             binaryConverter = GetToBinaryConverter();
         }
@@ -66,11 +65,7 @@ namespace SceneGate.Lemon.IntegrationTests.Titles
             int numStreams = DataStream.ActiveStreams;
 
             T actual = objectConverter.Convert(original);
-            string actualYaml = new SerializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .Build()
-                .Serialize(actual);
-            Assert.That(expectedYaml, Is.EqualTo(actualYaml));
+            AssertObjects(actual, expected);
 
             // Check everything is virtual node
             Assert.That(DataStream.ActiveStreams, Is.EqualTo(numStreams));
@@ -86,12 +81,17 @@ namespace SceneGate.Lemon.IntegrationTests.Titles
             T actual = objectConverter.Convert(original);
             using var actualBinary = binaryConverter.Convert(actual);
 
-            Assert.That(original.Stream.Compare(actualBinary.Stream), Is.True);
+            Assert.That(original.Stream.Compare(actualBinary.Stream), Is.True, "Binaries are not identical");
+        }
+
+        protected virtual void AssertObjects(T actual, T expected)
+        {
+            actual.Should().BeEquivalentTo(expected);
         }
 
         protected abstract BinaryFormat GetBinary();
 
-        protected abstract string GetObjectYaml();
+        protected abstract T GetObject();
 
         protected abstract IConverter<BinaryFormat, T> GetToObjectConverter();
 

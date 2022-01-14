@@ -114,7 +114,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 
         protected BinaryFormat GetBinary(int offset, int size)
         {
-            TestContext.WriteLine(Path.GetFileName(binaryPath));
+            TestContext.WriteLine($"{nameof(NcchConverterTests)}: {Path.GetFileName(binaryPath)}");
             var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
             return new BinaryFormat(stream);
         }

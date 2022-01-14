@@ -20,8 +20,13 @@
 namespace SceneGate.Lemon.IntegrationTests.Titles
 {
     using System.IO;
+    using System.Text.RegularExpressions;
+    using FluentAssertions;
+    using FluentAssertions.Equivalency;
     using NUnit.Framework;
     using SceneGate.Lemon.Titles;
+    using YamlDotNet.Serialization;
+    using YamlDotNet.Serialization.NamingConventions;
     using Yarhl.FileFormat;
     using Yarhl.IO;
 
@@ -44,16 +49,30 @@ namespace SceneGate.Lemon.IntegrationTests.Titles
             TestDataBase.IgnoreIfFileDoesNotExist(yamlPath);
         }
 
+        protected override void AssertObjects(TitleMetadata actual, TitleMetadata expected)
+        {
+            actual.Should().BeEquivalentTo(
+                expected,
+                opts => opts.Excluding(t => t.Signature)
+                    .Excluding(t => t.Hash)
+                    .Excluding((IMemberInfo i) => i.RemovingIndexes() == "InfoRecords.Hash")
+                    .Excluding((IMemberInfo i) => i.RemovingIndexes() == "Chunks.Hash"));
+        }
+
         protected override BinaryFormat GetBinary()
         {
-            TestContext.WriteLine(binaryPath);
+            TestContext.WriteLine($"{nameof(Binary2TitleMetadataTests)}: {Path.GetFileName(binaryPath)}");
             var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
             return new BinaryFormat(stream);
         }
 
-        protected override string GetObjectYaml()
+        protected override TitleMetadata GetObject()
         {
-            return File.ReadAllText(yamlPath);
+            string yaml = File.ReadAllText(yamlPath);
+            return new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .Build()
+                .Deserialize<TitleMetadata>(yaml);
         }
 
         protected override IConverter<BinaryFormat, TitleMetadata> GetToObjectConverter()
@@ -63,8 +82,7 @@ namespace SceneGate.Lemon.IntegrationTests.Titles
 
         protected override IConverter<TitleMetadata, BinaryFormat> GetToBinaryConverter()
         {
-            TestContext.Progress.WriteLine("Binary converter for TMD not implemented");
-            return null;
+            return new TitleMetadata2Binary();
         }
     }
 }
