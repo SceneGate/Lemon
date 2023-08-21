@@ -39,9 +39,7 @@ namespace SceneGate.Lemon.Containers.Converters
     /// that the TMD already has the updated chunks of the content and that the
     /// metadata match the exHeader and ExeFS info.</p>
     /// </remarks>
-    public class NodeContainer2BinaryCia :
-        IConverter<NodeContainerFormat, BinaryFormat>,
-        IInitializer<DataStream>
+    public class NodeContainer2BinaryCia : IConverter<NodeContainerFormat, BinaryFormat>
     {
         const int BlockSize = 64;
         const int ContentIndexSize = 0x2000;
@@ -49,13 +47,20 @@ namespace SceneGate.Lemon.Containers.Converters
         const ushort CiaType = 0; // the type of format, always 0 for 3DS
         const ushort CiaVersion = 0; // the version of the format
 
-        DataStream outputStream;
+        private readonly DataStream outputStream;
 
         /// <summary>
-        /// Initializes the converter with the output stream.
+        /// Initializes a new instance of the <see cref="NodeContainer2BinaryCia"/> class.
+        /// </summary>
+        public NodeContainer2BinaryCia()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NodeContainer2BinaryCia"/> class.
         /// </summary>
         /// <param name="parameters">The stream to write the new CIA.</param>
-        public void Initialize(DataStream parameters)
+        public NodeContainer2BinaryCia(DataStream parameters)
         {
             outputStream = parameters;
         }
@@ -215,7 +220,7 @@ namespace SceneGate.Lemon.Containers.Converters
             if (titleNode == null)
                 throw new FormatException("Missing game title");
 
-            var title = (TitleMetadata)ConvertFormat.With<Binary2TitleMetadata>(titleNode.Format);
+            TitleMetadata title = titleNode.GetFormatAs<IBinary>().ConvertWith(new Binary2TitleMetadata());
 
             int contentBitset = 0;
             long contentSize = 0;

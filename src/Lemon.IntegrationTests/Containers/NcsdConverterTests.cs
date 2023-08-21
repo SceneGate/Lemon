@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 {
     using System.IO;
     using NUnit.Framework;
+    using SceneGate.Lemon.Containers.Converters;
     using SceneGate.Lemon.Containers.Formats;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
@@ -50,7 +51,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
             TestDataBase.IgnoreIfFileDoesNotExist(yamlPath);
 
             actualNode = NodeFactory.FromFile(ncsdPath);
-            Assert.That(() => actualNode.TransformTo<Ncsd>(), Throws.Nothing);
+            Assert.That(() => actualNode.TransformWith<Binary2Ncsd>(), Throws.Nothing);
             actual = actualNode.GetFormatAs<Ncsd>();
 
             string yaml = File.ReadAllText(yamlPath);
