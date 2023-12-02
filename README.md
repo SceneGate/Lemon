@@ -1,15 +1,27 @@
-# Lemon [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://choosealicense.com/licenses/mit/) ![Build and release](https://github.com/SceneGate/Lemon/workflows/Build%20and%20release/badge.svg)
+# Lemon
 
-[Yarhl](https://github.com/SceneGate/yarhl) plugin for Nintendo 3DS common
-formats.
+<!-- markdownlint-disable MD033 -->
+<p align="center">
+  <a href="https://www.nuget.org/packages/SceneGate.Lemon">
+    <img alt="Stable version" src="https://img.shields.io/nuget/v/SceneGate.Lemon?label=nuget.org&logo=nuget" />
+  </a>
+  &nbsp;
+  <a href="https://dev.azure.com/SceneGate/SceneGate/_packaging?_a=feed&feed=SceneGate-Preview">
+    <img alt="GitHub commits since latest release (by SemVer)" src="https://img.shields.io/github/commits-since/SceneGate/Lemon/latest?sort=semver" />
+  </a>
+  &nbsp;
+  <a href="https://github.com/SceneGate/Lemon/workflows/Build%20and%20release">
+    <img alt="Build and release" src="https://github.com/SceneGate/Lemon/workflows/Build%20and%20release/badge.svg" />
+  </a>
+  &nbsp;
+  <a href="https://choosealicense.com/licenses/mit/">
+    <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat" />
+  </a>
+  &nbsp;
+</p>
 
-The library supports .NET 6.0 and above on Linux, Window and MacOS.
-
-<!-- prettier-ignore -->
-| Release | Package                                                           |
-| ------- | ----------------------------------------------------------------- |
-| Stable  | [![Nuget](https://img.shields.io/nuget/v/SceneGate.Lemon?label=nuget.org&logo=nuget)](https://www.nuget.org/packages/SceneGate.Lemon) |
-| Preview | [Azure Artifacts](https://dev.azure.com/SceneGate/SceneGate/_packaging?_a=feed&feed=SceneGate-Preview) |
+_Lemon_ is a library part of the [_SceneGate_](https://github.com/SceneGate)
+framework that provides support for **3DS file formats.**
 
 ## Supported formats
 
@@ -22,35 +34,66 @@ _Encryption, decryption or signature validation not supported yet._
 - **RomFS**: unpack and pack
 - **TMD**: deserialize
 
+## Usage
+
+The project provides the following .NET libraries (NuGet packages in nuget.org).
+The libraries works on supported versions of .NET: 6.0 and 8.0.
+
+- [![SceneGate.Lemon](https://img.shields.io/nuget/v/SceneGate.Lemon?label=SceneGate.Lemon&logo=nuget)](https://www.nuget.org/packages/SceneGate.Lemon):
+  support for 3DS formats
+
+Preview releases can be found in this
+[Azure DevOps package repository](https://dev.azure.com/SceneGate/SceneGate/_packaging?_a=feed&feed=SceneGate-Preview).
+To use a preview release, create a file `nuget.config` in the same directory of
+your solution file (.sln) with the following content:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear/>
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+    <add key="SceneGate-Preview" value="https://pkgs.dev.azure.com/SceneGate/SceneGate/_packaging/SceneGate-Preview/nuget/v3/index.json" />
+  </packageSources>
+  <packageSourceMapping>
+    <packageSource key="nuget.org">
+      <package pattern="*" />
+    </packageSource>
+    <packageSource key="SceneGate-Preview">
+      <package pattern="Yarhl*" />
+      <package pattern="Texim*" />
+      <package pattern="SceneGate*" />
+    </packageSource>
+  </packageSourceMapping>
+</configuration>
+```
+
 ## Documentation
 
-Feel free to ask any question in the
-[project Discussion site!](https://github.com/SceneGate/Lemon/discussions)
+Documentation is not yet available but it will be published in the
+[project website](https://scenegate.github.io/Lemon).
 
-Check our on-line [API documentation](https://scenegate.github.io/Lemon/).
+Don't hesitate to ask questions in the
+[project Discussion site!](https://github.com/SceneGate/Ekona/discussions)
 
 ## Build
 
-The project requires to build .NET 6.0 SDK and .NET Framework 4.8 or latest
-Mono. If you open the project with VS Code and you did install the
-[VS Code Remote Containers](https://code.visualstudio.com/docs/remote/containers)
-extension, you can have an already pre-configured development environment with
-Docker or Podman.
+The project requires to build .NET 8.0 SDK.
 
 To build, test and generate artifacts run:
 
 ```sh
-# Only required the first time
-dotnet tool restore
+# Build and run tests
+dotnet run --project build/orchestrator
 
-# Default target is Stage-Artifacts
-dotnet cake
+# (Optional) Create bundles (nuget, zips, docs)
+dotnet run --project build/orchestrator -- --target=Bundle
 ```
 
-To just build and test quickly, run:
+To build the documentation only, run:
 
 ```sh
-dotnet cake --target=BuildTest
+dotnet docfx docs/docfx.json --serve
 ```
 
 ## References

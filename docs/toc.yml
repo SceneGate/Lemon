@@ -1,11 +1,11 @@
-- name: Home
-  href: index.md
+- name: Dev guides
+  href: articles/dev/
 
-- name: Guides
-  href: guides/
+- name: Format specs
+  href: articles/specs/
 
-- name: API
-  href: dev/
+- name: Changelog
+  href: articles/changelog.md
 
 - name: GitHub
   href: https://github.com/SceneGate/Lemon

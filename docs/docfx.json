@@ -1,55 +1,66 @@
 {
-    "metadata": [
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "Lemon/*.csproj"
+          ],
+          "src": "../src"
+        }
+      ],
+      "dest": "api",
+      "includePrivateMembers": false,
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false,
+      "noRestore": false,
+      "namespaceLayout": "flattened",
+      "memberLayout": "samePage",
+      "EnumSortOrder": "alphabetic",
+      "allowCompilationErrors": false
+    }
+  ],
+  "build": {
+    "content": [
       {
-        "src": [
-          {
-            "files": [
-              "Lemon/Lemon.csproj"
-            ],
-            "src": "../src"
-          }
-        ],
-        "dest": "api",
-        "filter": "filter_config.yml",
-        "disableGitFeatures": false,
-        "disableDefaultFilter": false
+        "files": [
+          "api/**.yml",
+          "api/index.md"
+        ]
+      },
+      { "files": "**/*.{md,yml}", "src": "articles", "dest": "docs" },
+      { "files": [ "toc.yml", "*.md" ] }
+    ],
+    "resource": [
+      {
+        "files": [ "**/images/**", "**/resources/**" ],
+        "exclude": [ "_site/**", "obj/**" ]
       }
     ],
-    "build": {
-      "content": [
-        {
-          "files": [ "api/**.yml", "dev/**" ]
-        },
-        {
-          "files": [ "toc.yml", "index.md" ]
-        },
-        {
-          "files": [ "guides/**" ]
-        },
-        {
-          "files": ["README.md", "CONTRIBUTING.md"],
-          "src": "../"
-        }
-      ],
-      "resource": [
-        {
-          "files": ["images/**"]
-        }
-      ],
-      "dest": "_site",
-      "globalMetadataFiles": ["global_metadata.json"],
-      "fileMetadataFiles": [],
-      "template": [
-        "default",
-        "statictoc",
-        "default-widescreen"
-      ],
-      "postProcessors": ["ExtractSearchIndex"],
-      "markdownEngineName": "markdig",
-      "noLangKeyword": false,
-      "keepFileLink": false,
-      "cleanupCacheHistory": false,
-      "disableGitFeatures": false,
-      "xrefService": [ "https://xref.docs.microsoft.com/query?uid={uid}" ]
+    "output": "_site",
+    "globalMetadata": {
+      "_appTitle": "Lemon - 3DS formats for .NET",
+      "_appName": "Lemon",
+      "_appFooter": "<span>Copyright (c) 2019 SceneGate. Docs made with <a href=\"https://dotnet.github.io/docfx\" target=\"_blank\">docfx</a></span>",
+      "_appLogoPath": "images/logo-48.png",
+      "_appFaviconPath": "images/favicon.png",
+      "_enableSearch": true,
+      "_enableNewTab": true,
+      "_lang": "en"
+    },
+    "fileMetadataFiles": [],
+    "template": [
+      "default",
+      "modern",
+      "template"
+    ],
+    "postProcessors": [],
+    "keepFileLink": false,
+    "disableGitFeatures": false,
+    "sitemap": {
+      "baseUrl": "https://scenegate.github.io/Lemon",
+      "priority": 0.5,
+      "changefreq": "monthly"
     }
+  }
 }
