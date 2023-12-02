@@ -32,7 +32,7 @@ _Encryption, decryption or signature validation not supported yet._
 - **NCCH (CXI and CFA)**: unpack and pack
 - **ExeFS**: unpack and pack
 - **RomFS**: unpack and pack
-- **TMD**: deserialize
+- **TMD**: deserialize and serialize
 
 ## Usage
 

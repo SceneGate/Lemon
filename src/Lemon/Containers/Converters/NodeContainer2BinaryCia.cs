@@ -84,28 +84,20 @@ namespace SceneGate.Lemon.Containers.Converters
             }
 
             if (root.Children["title"].Format is not TitleMetadata) {
-                throw new FormatException("Unknown format for title node");
+                throw new FormatException("Unknown format for title node. It must be IBinary or TitleMetadata.");
             }
 
             var title = root.Children["title"].GetFormatAs<TitleMetadata>();
             UpdateTitleMetadata(title, root.Children["content"]);
-
-            var binaryConverter = new TitleMetadata2Binary();
-            var binaryTitle = binaryConverter.Convert(title);
-            root.Children["title"].ChangeFormat(binaryTitle);
+            root.Children["title"].TransformWith<TitleMetadata2Binary>();
 
             WriteHeader(writer, root);
 
             WriteFile(writer, root.Children["certs_chain"]);
             WriteFile(writer, root.Children["ticket"]);
+            WriteFile(writer, root.Children["title"]);
 
-            writer.Endianness = EndiannessMode.BigEndian;
-            binaryTitle.Stream.WriteTo(writer.Stream);
-            writer.Endianness = EndiannessMode.LittleEndian;
-
-            writer.WritePadding(0x00, BlockSize);
-
-            WriteContent(writer, root.Children["content"], root.Children["title"]);
+            WriteContent(writer, root.Children["content"], title);
             WriteFile(writer, root.Children["metadata"], false);
 
             return binary;
@@ -210,13 +202,8 @@ namespace SceneGate.Lemon.Containers.Converters
             }
         }
 
-        void WriteContent(DataWriter writer, Node content, Node titleNode)
+        void WriteContent(DataWriter writer, Node content, TitleMetadata title)
         {
-            if (titleNode == null)
-                throw new FormatException("Missing game title");
-
-            var title = (TitleMetadata)ConvertFormat.With<Binary2TitleMetadata>(titleNode.Format);
-
             int contentBitset = 0;
             long contentSize = 0;
             for (int i = 0; i < title.Chunks.Count; i++) {

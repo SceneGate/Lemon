@@ -1,3 +1,4 @@
+sign_type: 65540
 valid_signature: false
 signature_issuer: Root-CA00000003-CP0000000b
 version: 1
@@ -13,6 +14,9 @@ srl_flag: 0
 access_rights: 0
 title_version: 0
 boot_content: 0
+info_records:
+- command_count: 2
+  index_offset: 0
 chunks:
 - id: 0
   index: 0
