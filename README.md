@@ -90,6 +90,15 @@ dotnet run --project build/orchestrator
 dotnet run --project build/orchestrator -- --target=Bundle
 ```
 
+Some test binary resources are pushed via [Git LFS](https://git-lfs.com/). Make
+sure to clone these files as well, otherwise the tests would fail. On Linux you
+may need to install it and re-pull, for instance for Ubuntu run:
+
+```sh
+sudo apt install git-lfs
+git lfs pull
+```
+
 To build the documentation only, run:
 
 ```sh
