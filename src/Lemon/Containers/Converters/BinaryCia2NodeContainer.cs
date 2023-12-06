@@ -116,7 +116,7 @@ namespace SceneGate.Lemon.Containers.Converters
         {
             Node content = NodeFactory.CreateContainer("content");
 
-            var title = (TitleMetadata)ConvertFormat.With<Binary2TitleMetadata>(titleNode.Format);
+            TitleMetadata title = titleNode.GetFormatAs<IBinary>().ConvertWith(new Binary2TitleMetadata());
             foreach (var chunk in title.Chunks) {
                 var chunkNode = NodeFactory.FromSubstream(
                     chunk.GetChunkName(),
