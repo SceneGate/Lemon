@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,8 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
                     .Select(line => line.Split(','))
                     .Select(data => new TestFixtureData(
                         Path.Combine(ContainersResources, data[0]),
-                        Path.Combine(ContainersResources, data[1])));
+                        Path.Combine(ContainersResources, data[1]))
+                        .SetArgDisplayNames(data[0], data[1]));
         }
 
         private static IEnumerable GetSubstreamAndInfoCollection(string listName)
@@ -67,7 +68,8 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
                         Path.Combine(ContainersResources, data[0]),
                         Path.Combine(ContainersResources, data[1]),
                         int.Parse(data[2]),
-                        int.Parse(data[3])));
+                        int.Parse(data[3]))
+                        .SetArgDisplayNames(data[0], data[1]));
         }
     }
 }
