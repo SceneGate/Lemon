@@ -26,7 +26,7 @@ namespace SceneGate.Lemon.Titles
     /// <summary>
     /// Deserializer of binary title metadata.
     /// </summary>
-    public class Binary2TitleMetadata : IConverter<BinaryFormat, TitleMetadata>
+    public class Binary2TitleMetadata : IConverter<IBinary, TitleMetadata>
     {
         const int NumContentInfo = 64;
 
@@ -35,7 +35,7 @@ namespace SceneGate.Lemon.Titles
         /// </summary>
         /// <param name="source">The source binary.</param>
         /// <returns>The deserializer title metadata.</returns>
-        public TitleMetadata Convert(BinaryFormat source)
+        public TitleMetadata Convert(IBinary source)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));

@@ -4,7 +4,7 @@
     <AssemblyName>SceneGate.Lemon.IntegrationTests</AssemblyName>
     <Description>Integration tests for Lemon.</Description>
 
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
 
     <RootNamespace>SceneGate.Lemon.IntegrationTests</RootNamespace>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
@@ -18,7 +18,10 @@
     <PackageReference Include="nunit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

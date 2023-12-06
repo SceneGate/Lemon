@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,13 +57,14 @@ namespace SceneGate.Lemon.IntegrationTests
 
         public static IEnumerable<string> ReadTestListFile(string filePath)
         {
-            if (!File.Exists(filePath))
+            if (!File.Exists(filePath)) {
                 return Array.Empty<string>();
+            }
 
             return File.ReadAllLines(filePath)
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.Trim())
-                .Where(line => !line.StartsWith("#"));
+                .Where(line => !line.StartsWith('#'));
         }
     }
 }

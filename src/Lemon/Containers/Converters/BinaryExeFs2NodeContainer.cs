@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ namespace SceneGate.Lemon.Containers.Converters
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
-    using SceneGate.Lemon.Logging;
+    using Microsoft.Extensions.Logging;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
@@ -38,11 +38,18 @@ namespace SceneGate.Lemon.Containers.Converters
         IConverter<BinaryFormat, NodeContainerFormat>,
         IConverter<NodeContainerFormat, BinaryFormat>
     {
-        const int NumberFiles = 10;
-        const int HeaderSize = 0x200;
-        const int Sha256Size = 0x20;
+        private const int NumberFiles = 10;
+        private const int HeaderSize = 0x200;
+        private const int Sha256Size = 0x20;
+        private readonly ILogger logger;
 
-        static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BinaryExeFs2NodeContainer"/> class.
+        /// </summary>
+        public BinaryExeFs2NodeContainer()
+        {
+            logger = LoggerFactory.Instance.CreateLogger<BinaryExeFs2NodeContainer>();
+        }
 
         /// <summary>
         /// Converts a binary stream with Executable file system into nodes.
@@ -52,8 +59,7 @@ namespace SceneGate.Lemon.Containers.Converters
         [SuppressMessage("Reliability", "CA2000", Justification = "Transfer ownership")]
         public NodeContainerFormat Convert(BinaryFormat source)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             var reader = new DataReader(source.Stream) {
                 DefaultEncoding = Encoding.ASCII,
@@ -82,7 +88,7 @@ namespace SceneGate.Lemon.Containers.Converters
                 byte[] actual = ComputeHash(container.Root.Children[i].Stream);
 
                 if (!expected.SequenceEqual(actual)) {
-                    Logger.Warn($"Wrong hash for child {container.Root.Children[i].Name}");
+                    logger.LogWarning("Wrong hash for child {name}", container.Root.Children[i].Name);
                 }
             }
 
@@ -97,8 +103,7 @@ namespace SceneGate.Lemon.Containers.Converters
         /// <returns>The new binary container.</returns>
         public BinaryFormat Convert(NodeContainerFormat source)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             var binary = new BinaryFormat();
             var writer = new DataWriter(binary.Stream) {
@@ -142,7 +147,7 @@ namespace SceneGate.Lemon.Containers.Converters
         }
 
         [SuppressMessage("Reliability", "CA2000", Justification = "Transfer ownership")]
-        static Node GetNodeFromHeader(DataReader reader)
+        private static Node GetNodeFromHeader(DataReader reader)
         {
             string name = reader.ReadString(8).Replace("\0", string.Empty);
             uint offset = reader.ReadUInt32() + HeaderSize;
@@ -156,7 +161,7 @@ namespace SceneGate.Lemon.Containers.Converters
             return node;
         }
 
-        static byte[] ComputeHash(DataStream stream)
+        private static byte[] ComputeHash(DataStream stream)
         {
             byte[] hash;
             using (SHA256 sha = SHA256.Create()) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,14 +45,28 @@ namespace SceneGate.Lemon.Containers.Converters
     /// <para>Level 0, 1 and 2 only contain SHA-256 hashes of the upper layer.
     /// Level 3 contains the file system metadata and file data.</para>
     /// </remarks>
-    public class NodeContainer2BinaryIvfc :
-        IInitializer<DataStream>,
-        IConverter<NodeContainerFormat, BinaryFormat>
+    public class NodeContainer2BinaryIvfc : IConverter<NodeContainerFormat, BinaryFormat>
     {
         const int BlockSizeLog = 0x0C;
         const int BlockSize = 1 << BlockSizeLog;
 
-        DataStream stream;
+        private readonly DataStream stream;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NodeContainer2BinaryIvfc"/> class.
+        /// </summary>
+        public NodeContainer2BinaryIvfc()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NodeContainer2BinaryIvfc"/> class.
+        /// </summary>
+        /// <param name="outputStream">Stream to write to.</param>
+        public NodeContainer2BinaryIvfc(DataStream outputStream)
+        {
+            stream = outputStream;
+        }
 
         /// <summary>
         /// Gets the magic identifier of the format.
@@ -68,15 +82,6 @@ namespace SceneGate.Lemon.Containers.Converters
         /// <value>The format version.</value>
         public static uint Version {
             get { return 0x0001_0000; }
-        }
-
-        /// <summary>
-        /// Initialize the converter by providing the stream to write to.
-        /// </summary>
-        /// <param name="parameters">Stream to write to.</param>
-        public void Initialize(DataStream parameters)
-        {
-            this.stream = parameters;
         }
 
         /// <summary>

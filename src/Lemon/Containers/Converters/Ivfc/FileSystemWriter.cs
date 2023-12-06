@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using SceneGate.Lemon.Logging;
+    using Microsoft.Extensions.Logging;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
@@ -31,26 +31,26 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
     /// </summary>
     internal class FileSystemWriter
     {
-        const int HeaderSize = 0x28;
-        const int DirMetadataSize = 0x18;
-        const int FileMetadataSize = 0x20;
-        const int HashSize = 4;
-        static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
-        static readonly Encoding NameEncoding = Encoding.Unicode;
+        private const int HeaderSize = 0x28;
+        private const int DirMetadataSize = 0x18;
+        private const int FileMetadataSize = 0x20;
+        private const int HashSize = 4;
+        private static readonly Encoding NameEncoding = Encoding.Unicode;
 
-        readonly Node root;
+        private readonly Node root;
+        private readonly ILogger logger;
 
-        FileSystemInfo info;
-        Section dirHashTable;
-        Section dirInfoTable;
-        Section fileHashTable;
-        Section fileInfoTable;
-        Section fileData;
-        List<Node> files;
+        private FileSystemInfo info;
+        private Section dirHashTable;
+        private Section dirInfoTable;
+        private Section fileHashTable;
+        private Section fileInfoTable;
+        private Section fileData;
+        private List<Node> files;
 
-        DataWriter streamWriter;
-        DataWriter writer;
-        DataReader reader;
+        private DataWriter streamWriter;
+        private DataWriter writer;
+        private DataReader reader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileSystemWriter" />
@@ -60,6 +60,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
         public FileSystemWriter(Node root)
         {
             this.root = root;
+            logger = LoggerFactory.Instance.CreateLogger<FileSystemWriter>();
 
             Analyze();
             PrecalculateSize();
@@ -115,7 +116,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             WriteFiles();
         }
 
-        void Analyze()
+        private void Analyze()
         {
             info = new FileSystemInfo();
             info.Directories = 1; // root, no name.
@@ -125,7 +126,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
                     info.Directories++;
                     info.DirNamesLength += NameEncoding.GetByteCount(node.Name).Pad(0x04);
                 } else if (node.Stream == null) {
-                    Logger.Error($"Node '{node.Path}' is not a folder or a binary file.");
+                    logger.LogError("Node '{path}' is not a folder or a binary file.", node.Path);
                 } else {
                     info.Files++;
                     info.FileNamesLength += NameEncoding.GetByteCount(node.Name).Pad(0x04);
@@ -137,7 +138,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             info.FileHashes = NameHash.CalculateTableLength(info.Files);
         }
 
-        void PrecalculateSize()
+        private void PrecalculateSize()
         {
             dirHashTable = new Section {
                 Offset = HeaderSize,
@@ -165,7 +166,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             };
         }
 
-        void WriteFiles()
+        private void WriteFiles()
         {
             foreach (var file in files)
             {
@@ -174,7 +175,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             }
         }
 
-        void WriteNode(Node current, uint currentOffset)
+        private void WriteNode(Node current, uint currentOffset)
         {
             var subFiles = current.Children.Where(n => !n.IsContainer).ToList();
             for (int i = 0; i < subFiles.Count; i++)
@@ -196,7 +197,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             }
         }
 
-        void WriteHeader()
+        private void WriteHeader()
         {
             writer.Write(HeaderSize);
             writer.Write((uint)dirHashTable.Offset);
@@ -210,7 +211,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             writer.Write((uint)fileData.Offset);
         }
 
-        void WriteDirectoryInfo(Node dir, bool isFirst, bool isLast, uint parentOffset)
+        private void WriteDirectoryInfo(Node dir, bool isFirst, bool isLast, uint parentOffset)
         {
             uint currentPosition = (uint)dirInfoTable.Position;
             uint relativeParent = (uint)(parentOffset - dirInfoTable.Offset);
@@ -254,7 +255,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             }
         }
 
-        void WriteFileInfo(Node file, bool isFirst, bool isLast, uint parentOffset)
+        private void WriteFileInfo(Node file, bool isFirst, bool isLast, uint parentOffset)
         {
             uint currentPosition = (uint)fileInfoTable.Position;
             uint relativeParent = (uint)(parentOffset - dirInfoTable.Offset);
@@ -299,7 +300,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             fileData.Position += file.Stream.Length.Pad(0x10);
         }
 
-        class FileSystemInfo
+        private sealed class FileSystemInfo
         {
             public int Directories { get; set; }
 
@@ -316,7 +317,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
             public long FileDataLength { get; set; }
         }
 
-        class Section
+        private sealed class Section
         {
             public long Offset { get; set; }
 

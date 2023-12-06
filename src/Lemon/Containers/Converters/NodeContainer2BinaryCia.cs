@@ -38,23 +38,28 @@ namespace SceneGate.Lemon.Containers.Converters
     /// <p>This converter will update the hashes of the TMD except if the
     /// content is encrypted.</p>
     /// </remarks>
-    public class NodeContainer2BinaryCia :
-        IConverter<NodeContainerFormat, BinaryFormat>,
-        IInitializer<DataStream>
+    public class NodeContainer2BinaryCia : IConverter<NodeContainerFormat, BinaryFormat>
     {
-        const int BlockSize = 64;
-        const int ContentIndexSize = 0x2000;
-        const int HeaderSize = 0x20 + ContentIndexSize;
-        const ushort CiaType = 0; // the type of format, always 0 for 3DS
-        const ushort CiaVersion = 0; // the version of the format
+        private const int BlockSize = 64;
+        private const int ContentIndexSize = 0x2000;
+        private const int HeaderSize = 0x20 + ContentIndexSize;
+        private const ushort CiaType = 0; // the type of format, always 0 for 3DS
+        private const ushort CiaVersion = 0; // the version of the format
 
-        DataStream outputStream;
+        private readonly DataStream outputStream;
 
         /// <summary>
-        /// Initializes the converter with the output stream.
+        /// Initializes a new instance of the <see cref="NodeContainer2BinaryCia"/> class.
+        /// </summary>
+        public NodeContainer2BinaryCia()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NodeContainer2BinaryCia"/> class.
         /// </summary>
         /// <param name="parameters">The stream to write the new CIA.</param>
-        public void Initialize(DataStream parameters)
+        public NodeContainer2BinaryCia(DataStream parameters)
         {
             outputStream = parameters;
         }
@@ -66,8 +71,7 @@ namespace SceneGate.Lemon.Containers.Converters
         /// <returns>The new binary format with the CIA.</returns>
         public BinaryFormat Convert(NodeContainerFormat source)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             var binary = (outputStream != null) ? new BinaryFormat(outputStream) : new BinaryFormat();
             binary.Stream.Position = 0;
@@ -102,7 +106,7 @@ namespace SceneGate.Lemon.Containers.Converters
             return binary;
         }
 
-        void WriteHeader(DataWriter writer, Node root)
+        private void WriteHeader(DataWriter writer, Node root)
         {
             writer.Write(HeaderSize);
             writer.Write(CiaType);
@@ -116,10 +120,14 @@ namespace SceneGate.Lemon.Containers.Converters
             writer.WritePadding(0x00, BlockSize);
         }
 
-        void WriteFile(DataWriter writer, Node file, bool isRequired = true)
+        private void WriteFile(DataWriter writer, Node file, bool isRequired = true)
         {
             if (file == null && isRequired) {
                 throw new FileNotFoundException("Missing CIA file");
+            }
+
+            if (file is null) {
+                return;
             }
 
             if (file.Format is not IBinary) {
@@ -167,17 +175,18 @@ namespace SceneGate.Lemon.Containers.Converters
             }
         }
 
-        void WriteContent(DataWriter writer, Node content, TitleMetadata title)
+        private void WriteContent(DataWriter writer, Node content, TitleMetadata title)
         {
             int contentBitset = 0;
             long contentSize = 0;
             for (int i = 0; i < title.Chunks.Count; i++) {
                 string childName = title.Chunks[i].GetChunkName();
-                var child = content.Children[childName];
-                if (child is null)
-                    throw new FormatException($"Missing child: {childName}");
-                if (child.Format is not IBinary)
+                var child = content.Children[childName]
+                    ?? throw new FormatException($"Missing child: {childName}");
+
+                if (child.Format is not IBinary) {
                     throw new FormatException($"Cannot write child {childName} as it is not binary");
+                }
 
                 child.Stream.WriteTo(writer.Stream);
                 contentSize += child.Stream.Length;
