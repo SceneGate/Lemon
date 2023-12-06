@@ -138,7 +138,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
                     Assert.That(child.Stream.Offset, Is.EqualTo(offset + expected.RegionsOffset[i]));
                 }
 
-                Assert.That(child.Stream.Length, Is.EqualTo(expected.RegionsSize[i]));
+                Assert.That(child.Stream.Length, Is.EqualTo(expected.RegionsSize[i]), "Invalid region {0} size", i);
             }
         }
     }

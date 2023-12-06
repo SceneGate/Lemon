@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -115,8 +115,8 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
             }
 
             if (info.StreamLength > 0) {
-                Assert.That(node.Stream.Offset, Is.EqualTo(info.StreamOffset), node.Path);
-                Assert.That(node.Stream.Length, Is.EqualTo(info.StreamLength), node.Path);
+                Assert.That(node.Stream.Offset, Is.EqualTo(info.StreamOffset), "Invalid offset for: {0}", node.Path);
+                Assert.That(node.Stream.Length, Is.EqualTo(info.StreamLength), "Invalid length for: {0}", node.Path);
             }
 
             if (info.CheckChildren) {
