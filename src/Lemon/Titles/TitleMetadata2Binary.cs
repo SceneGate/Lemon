@@ -32,6 +32,8 @@ namespace SceneGate.Lemon.Titles
     /// </summary>
     public class TitleMetadata2Binary : IConverter<TitleMetadata, BinaryFormat>
     {
+        private static readonly byte[] EmptyRecord = new byte[0x24];
+
         /// <summary>
         /// Converts a title metadata object into a binary format.
         /// </summary>
@@ -73,7 +75,7 @@ namespace SceneGate.Lemon.Titles
 
             for (int i = 0; i < 64; i++) {
                 if (i >= source.InfoRecords.Count) {
-                    writer.Write(new byte[24]);
+                    writer.Write(EmptyRecord);
                     continue;
                 }
 
