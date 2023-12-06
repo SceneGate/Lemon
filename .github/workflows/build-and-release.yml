@@ -17,11 +17,11 @@ jobs:
     with:
       dotnet_version: '8.0.100'
 
-  # Preview release on push to main only
+  # Preview release on push to develop only
   # Stable release on version tag push only
   deploy:
     name: "Deploy"
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')
     needs: build
     uses: ./.github/workflows/deploy.yml
     with:
