@@ -24,20 +24,28 @@
 // THE SOFTWARE.
 namespace SceneGate.Lemon.Titles
 {
-    using System;
+    using System.Collections.ObjectModel;
+    using System.Security.Cryptography;
     using Yarhl.FileFormat;
     using Yarhl.IO;
 
     /// <summary>
     /// Convert a TitleMetadata object into binary format.
     /// </summary>
+    /// <remarks>
+    /// It updates the record's hashes and TMD hash. It does not update the
+    /// chunks (CIA content children) hashes or lengths.
+    /// </remarks>
     public class TitleMetadata2Binary : IConverter<TitleMetadata, BinaryFormat>
     {
+        private const int NumContentInfo = 64;
+        private static readonly byte[] EmptyRecord = new byte[0x24];
+
         /// <summary>
         /// Converts a title metadata object into a binary format.
         /// </summary>
-        /// <param name="source">The source binary.</param>
-        /// <returns>The deserializer title metadata.</returns>
+        /// <param name="source">The object to serialize.</param>
+        /// <returns>The serialized title metadata.</returns>
         public BinaryFormat Convert(TitleMetadata source)
         {
             var binary = new BinaryFormat();
@@ -45,9 +53,47 @@ namespace SceneGate.Lemon.Titles
                 Endianness = EndiannessMode.BigEndian,
             };
 
+            WriteHeader(source, writer);
+
+            // hash placeholder
+            writer.Stream.PushCurrentPosition();
+            writer.WriteTimes(0x00, 0x20);
+
+            // An info record is associated with one or more "commands" or chunks.
+            // To update the hash in the record, we need to write its chunks and hash them.
+            // We write chunks in a separate stream as we hash them.
+            using var chunksStream = new DataStream();
+            int chunksWritten = 0;
+
+            long recordsInfoStart = writer.Stream.Position;
+            long recordsLength = NumContentInfo * 0x24;
+            for (int i = 0; i < NumContentInfo; i++) {
+                if (i >= source.InfoRecords.Count || source.InfoRecords[i].IsEmpty) {
+                    writer.Write(EmptyRecord);
+                    continue;
+                }
+
+                WriteRecord(source.InfoRecords[i], source.Chunks, writer, chunksWritten, chunksStream);
+                chunksWritten += source.InfoRecords[i].CommandCount;
+            }
+
+            // Write chunks
+            chunksStream.WriteTo(writer.Stream);
+
+            // Now we have the records, hash them and write it
+            source.Hash = SHA256FromStream(writer.Stream, recordsInfoStart, recordsLength);
+
+            writer.Stream.PopPosition();
+            writer.Write(source.Hash);
+
+            return binary;
+        }
+
+        private static void WriteHeader(TitleMetadata source, DataWriter writer)
+        {
             writer.Write(source.SignType);
             writer.Write(source.Signature);
-            writer.Write(source.SignatureIssuer.PadRight(0x40, '\0'));
+            writer.Write(source.SignatureIssuer, 0x40);
             writer.Write(source.Version);
             writer.Write(source.CaCrlVersion);
             writer.Write(source.SignerCrlVersion);
@@ -59,7 +105,7 @@ namespace SceneGate.Lemon.Titles
             writer.Write(source.GroupId);
             writer.Write(source.SaveSize);
             writer.Write(source.SrlPrivateSaveSize);
-            writer.Write(new byte[0x4]); // Reserved
+            writer.Write(0); // Reserved
 
             writer.Write(source.SrlFlag);
             writer.Write(new byte[0x31]); // Reserved
@@ -68,32 +114,52 @@ namespace SceneGate.Lemon.Titles
             writer.Write(source.TitleVersion);
             writer.Write((short)source.Chunks.Count);
             writer.Write((short)source.BootContent);
-            writer.Write(new byte[0x2]); // Padding
+            writer.Write((short)0); // Padding
+        }
 
-            writer.Write(source.Hash);
+        private static void WriteRecord(
+            ContentInfoRecord record,
+            Collection<ContentChunkRecord> chunks,
+            DataWriter writer,
+            int firstChunkIndex,
+            DataStream chunksStream)
+        {
+            long chunksStart = chunksStream.Position;
+            long chunksLength = 0x30 * record.CommandCount;
+            var chunksWriter = new DataWriter(chunksStream) {
+                Endianness = EndiannessMode.BigEndian,
+            };
 
-            for (int i = 0; i < source.InfoRecords.Count; i++) {
-                var infoRecord = source.InfoRecords[i];
-
-                writer.Write(infoRecord.IndexOffset);
-                writer.Write(infoRecord.CommandCount);
-                writer.Write(infoRecord.Hash);
+            for (int k = 0; k < record.CommandCount; k++) {
+                ContentChunkRecord chunk = chunks[firstChunkIndex + k];
+                WriteChunkInfo(chunk, chunksWriter);
             }
 
-            for (int i = 0; i < source.Chunks.Count; i++) {
-                var chunk = source.Chunks[i];
+            record.Hash = SHA256FromStream(chunksStream, chunksStart, chunksLength);
 
-                writer.Write(chunk.Id);
-                writer.Write(chunk.Index);
+            writer.Write(record.IndexOffset);
+            writer.Write(record.CommandCount);
+            writer.Write(record.Hash);
+        }
 
-                int attribute = (int)Enum.Parse(typeof(ContentAttributes), chunk.Attributes.ToString());
-                writer.Write((short)attribute);
+        private static void WriteChunkInfo(ContentChunkRecord chunkInfo, DataWriter writer)
+        {
+            writer.Write(chunkInfo.Id);
+            writer.Write(chunkInfo.Index);
+            writer.Write((short)chunkInfo.Attributes);
+            writer.Write(chunkInfo.Size);
+            writer.Write(chunkInfo.Hash);
+        }
 
-                writer.Write(chunk.Size);
-                writer.Write(chunk.Hash);
+        private static byte[] SHA256FromStream(Stream stream, long offset, long length)
+        {
+            using var sha256 = SHA256.Create();
+            try {
+                using var substream = new DataStream(stream, offset, length);
+                return sha256.ComputeHash(substream);
+            } catch (Exception ex) {
+                throw new FormatException($"Failed to perform SHA256 during TMD update", ex);
             }
-
-            return binary;
         }
     }
 }

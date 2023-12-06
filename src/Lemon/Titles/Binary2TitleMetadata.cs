@@ -48,16 +48,17 @@ namespace SceneGate.Lemon.Titles
             TitleMetadata metadata = new TitleMetadata();
 
             // TODO: Validate signature
-            uint signType = reader.ReadUInt32();
-            metadata.SignType = signType;
-            int signSize = GetSignatureSize(signType);
+            metadata.SignType = reader.ReadUInt32();
+            int signSize = GetSignatureSize(metadata.SignType);
             metadata.Signature = reader.ReadBytes(signSize);
 
             metadata = ReadHeader(reader, out int contentCount, metadata);
 
             for (int i = 0; i < NumContentInfo; i++) {
                 ContentInfoRecord infoRecord = ReadInfoRecord(reader);
-                metadata.InfoRecords.Add(infoRecord);
+                if (!infoRecord.IsEmpty) {
+                    metadata.InfoRecords.Add(infoRecord);
+                }
             }
 
             for (int i = 0; i < contentCount; i++) {
@@ -94,7 +95,7 @@ namespace SceneGate.Lemon.Titles
             metadata.BootContent = reader.ReadInt16();
             reader.Stream.Position += 2; // padding
 
-            reader.Stream.Position += 0x20; // SHA-256 hash content info records
+            metadata.Hash = reader.ReadBytes(0x20);
 
             return metadata;
         }

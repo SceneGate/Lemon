@@ -2,6 +2,6 @@
 fake.ncsd,fake_ncsd.yml
 
 # Optionals not committed
-aofm.3ds,aofm.yml
+tloz_oot3d.3ds,tloz_oot3d.yml
 update.csu,update.yml
 nand.bin,nand.yml

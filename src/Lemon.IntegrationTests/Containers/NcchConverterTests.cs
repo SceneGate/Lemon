@@ -114,7 +114,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 
         protected BinaryFormat GetBinary(int offset, int size)
         {
-            TestContext.WriteLine(Path.GetFileName(binaryPath));
+            TestContext.WriteLine($"{nameof(NcchConverterTests)}: {Path.GetFileName(binaryPath)}");
             var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
             return new BinaryFormat(stream);
         }
@@ -138,7 +138,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
                     Assert.That(child.Stream.Offset, Is.EqualTo(offset + expected.RegionsOffset[i]));
                 }
 
-                Assert.That(child.Stream.Length, Is.EqualTo(expected.RegionsSize[i]));
+                Assert.That(child.Stream.Length, Is.EqualTo(expected.RegionsSize[i]), "Invalid region {0} size", i);
             }
         }
     }

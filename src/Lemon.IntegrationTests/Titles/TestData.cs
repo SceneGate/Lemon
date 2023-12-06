@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,8 @@ namespace SceneGate.Lemon.IntegrationTests.Titles
                         Path.Combine(ResourceDirectory, data[0]),
                         Path.Combine(ResourceDirectory, data[1]),
                         int.Parse(data[2]),
-                        int.Parse(data[3])));
+                        int.Parse(data[3]))
+                        .SetArgDisplayNames(data[0], data[1]));
         }
     }
 }

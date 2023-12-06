@@ -1,18 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <OutputType>Library</OutputType>
     <AssemblyName>SceneGate.Lemon.IntegrationTests</AssemblyName>
-    <RootNamespace>SceneGate.Lemon.IntegrationTests</RootNamespace>
     <Description>Integration tests for Lemon.</Description>
+
     <TargetFrameworks>net6.0</TargetFrameworks>
+
+    <RootNamespace>SceneGate.Lemon.IntegrationTests</RootNamespace>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.csproj" />
 
     <PackageReference Include="YamlDotNet" />
+    <PackageReference Include="FluentAssertions" />
     <PackageReference Include="nunit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

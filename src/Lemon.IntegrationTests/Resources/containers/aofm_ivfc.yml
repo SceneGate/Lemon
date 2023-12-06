@@ -15,7 +15,7 @@ children:
     children:
       - name: fix.xr
         format_type: Yarhl.IO.BinaryFormat
-        stream_offset: 169007792
+        stream_offset: 0xA12D3F0
         stream_length: 24592
         tags:
         check_children: true
@@ -27,28 +27,28 @@ children:
         children:
           - name: c100.xc
             format_type: Yarhl.IO.BinaryFormat
-            stream_offset: 169032384
+            stream_offset: 169030656
             stream_length: 281444
             tags:
             check_children: true
             children:
           - name: c101.xc
             format_type: Yarhl.IO.BinaryFormat
-            stream_offset: 169313840
+            stream_offset: 169312112
             stream_length: 283876
             tags:
             check_children: true
             children:
           - name: c102.xc
             format_type: Yarhl.IO.BinaryFormat
-            stream_offset: 169597728
+            stream_offset: 169596000
             stream_length: 314324
             tags:
             check_children: true
             children:
           - name: c103.xc
             format_type: Yarhl.IO.BinaryFormat
-            stream_offset: 169912064
+            stream_offset: 169910336
             stream_length: 350356
             tags:
             check_children: true

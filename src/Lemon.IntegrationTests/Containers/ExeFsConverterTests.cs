@@ -19,6 +19,7 @@
 // SOFTWARE.
 namespace SceneGate.Lemon.IntegrationTests.Containers
 {
+    using System.IO;
     using NUnit.Framework;
     using SceneGate.Lemon.Containers.Converters;
     using Yarhl.FileFormat;
@@ -46,7 +47,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 
         protected override BinaryFormat GetBinary()
         {
-            TestContext.WriteLine(binaryPath);
+            TestContext.WriteLine($"{nameof(ExeFsConverterTests)}: {Path.GetFileName(binaryPath)}");
             var stream = DataStreamFactory.FromFile(binaryPath, FileOpenMode.Read, offset, size);
             return new BinaryFormat(stream);
         }

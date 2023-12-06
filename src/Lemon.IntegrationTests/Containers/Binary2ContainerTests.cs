@@ -1,4 +1,4 @@
-// Copyright (c) 2019 SceneGate
+﻿// Copyright (c) 2019 SceneGate
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -103,26 +103,25 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 
         private static void CheckNode(NodeContainerInfo info, Node node)
         {
-            TestContext.WriteLine(node.Path);
-            Assert.That(node.Name, Is.EqualTo(info.Name));
-            Assert.That(node.Format?.GetType().FullName, Is.EqualTo(info.FormatType));
+            Assert.That(node.Name, Is.EqualTo(info.Name), node.Path);
+            Assert.That(node.Format?.GetType().FullName, Is.EqualTo(info.FormatType), node.Path);
 
             if (info.Tags != null) {
                 // YAML deserializer always gets the value as a string
                 foreach (var entry in info.Tags) {
-                    Assert.That(node.Tags.ContainsKey(entry.Key), Is.True);
-                    Assert.That(node.Tags[entry.Key].ToString(), Is.EqualTo(entry.Value));
+                    Assert.That(node.Tags.ContainsKey(entry.Key), Is.True, node.Path);
+                    Assert.That(node.Tags[entry.Key].ToString(), Is.EqualTo(entry.Value), node.Path);
                 }
             }
 
             if (info.StreamLength > 0) {
-                Assert.That(node.Stream.Offset, Is.EqualTo(info.StreamOffset));
-                Assert.That(node.Stream.Length, Is.EqualTo(info.StreamLength));
+                Assert.That(node.Stream.Offset, Is.EqualTo(info.StreamOffset), "Invalid offset for: {0}", node.Path);
+                Assert.That(node.Stream.Length, Is.EqualTo(info.StreamLength), "Invalid length for: {0}", node.Path);
             }
 
             if (info.CheckChildren) {
                 int expectedCount = info.Children?.Count ?? 0;
-                Assert.That(expectedCount, Is.EqualTo(node.Children.Count));
+                Assert.That(expectedCount, Is.EqualTo(node.Children.Count), node.Path);
 
                 for (int i = 0; i < expectedCount; i++) {
                     CheckNode(info.Children[i], node.Children[i]);
