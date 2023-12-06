@@ -42,18 +42,26 @@ namespace SceneGate.Lemon.Containers.Converters
     /// extended_header (optional), access_descriptor (optional), sdk_info.txt (optional),
     /// logo.bin (optional), system (optional), rom (optional).</p>
     /// </remarks>
-    public class Ncch2Binary :
-        IConverter<Ncch, BinaryFormat>
+    public class Ncch2Binary : IConverter<Ncch, BinaryFormat>
     {
-        DataStream stream;
+        private readonly DataStream stream;
 
         /// <summary>
-        /// Initialize the converter by providing the stream to write to.
+        /// Initializes a new instance of the <see cref="Ncch2Binary"/> class.
         /// </summary>
-        /// <param name="parameters">Stream to write to.</param>
-        public void Initialize(DataStream parameters)
+        public Ncch2Binary()
         {
-            this.stream = parameters;
+            stream = null;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Ncch2Binary"/> class.
+        /// </summary>
+        /// <param name="stream">Stream to write to.</param>
+        public Ncch2Binary(DataStream stream)
+        {
+            ArgumentNullException.ThrowIfNull(stream);
+            this.stream = stream;
         }
 
         /// <summary>
@@ -63,8 +71,7 @@ namespace SceneGate.Lemon.Containers.Converters
         /// <returns>The new binary container.</returns>
         public BinaryFormat Convert(Ncch source)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             var binary = (stream != null) ? new BinaryFormat(stream) : new BinaryFormat();
             var writer = new DataWriter(binary.Stream);
@@ -140,7 +147,7 @@ namespace SceneGate.Lemon.Containers.Converters
             return binary;
         }
 
-        void WriteFile(DataWriter writer, Node file, bool isRequired = true)
+        private void WriteFile(DataWriter writer, Node file, bool isRequired = true)
         {
             if (file == null && isRequired) {
                 throw new System.IO.FileNotFoundException("Missing NCCH file");
@@ -155,7 +162,7 @@ namespace SceneGate.Lemon.Containers.Converters
             file.Stream.WriteTo(writer.Stream);
         }
 
-        void WriteOffsetSizeAndData(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
+        private void WriteOffsetSizeAndData(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
         {
             if (file != null) {
                 long position = writer.Stream.Position;
@@ -182,30 +189,29 @@ namespace SceneGate.Lemon.Containers.Converters
             }
         }
 
-        void WriteSHA256(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
+        private void WriteSHA256(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
         {
-            using (SHA256 sha256 = SHA256.Create()) {
-                try {
-                    if (file == null) {
-                        writer.Write(new byte[0x20]);
-                        return;
-                    }
-
-                    if (hasHashRegion && hashRegion == 0) {
-                        writer.Write(sha256.ComputeHash(new byte[0x0]));
-                    } else if (hasHashRegion) {
-                        int hashSize = hashRegion * 0x200;
-                        byte[] buffer = new byte[hashSize];
-                        file.Stream.Position = 0;
-                        file.Stream.Read(buffer, 0, hashSize);
-
-                        writer.Write(sha256.ComputeHash(buffer));
-                    } else {
-                        writer.Write(sha256.ComputeHash(file.Stream));
-                    }
-                } catch (Exception ex) {
-                    throw new FormatException($"Failed to perform SHA256 for {file.Name}", ex);
+            using var sha256 = SHA256.Create();
+            try {
+                if (file == null) {
+                    writer.Write(new byte[0x20]);
+                    return;
                 }
+
+                if (hasHashRegion && hashRegion == 0) {
+                    writer.Write(sha256.ComputeHash(Array.Empty<byte>()));
+                } else if (hasHashRegion) {
+                    int hashSize = hashRegion * 0x200;
+                    byte[] buffer = new byte[hashSize];
+                    file.Stream.Position = 0;
+                    file.Stream.Read(buffer, 0, hashSize);
+
+                    writer.Write(sha256.ComputeHash(buffer));
+                } else {
+                    writer.Write(sha256.ComputeHash(file.Stream));
+                }
+            } catch (Exception ex) {
+                throw new FormatException($"Failed to perform SHA256 for {file.Name}", ex);
             }
         }
     }
