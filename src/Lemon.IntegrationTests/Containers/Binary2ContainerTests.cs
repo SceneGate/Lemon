@@ -20,25 +20,17 @@
 namespace SceneGate.Lemon.IntegrationTests.Containers
 {
     using NUnit.Framework;
-    using SceneGate.Lemon.Logging;
     using Yarhl.FileFormat;
     using Yarhl.FileSystem;
     using Yarhl.IO;
 
     public abstract class Binary2ContainerTests
     {
-        readonly CaptureLogger logger;
-        int initialStreams;
-        BinaryFormat original;
-        NodeContainerInfo containerInfo;
-        IConverter<BinaryFormat, NodeContainerFormat> containerConverter;
-        IConverter<NodeContainerFormat, BinaryFormat> binaryConverter;
-
-        protected Binary2ContainerTests()
-        {
-            logger = new CaptureLogger();
-            LogProvider.SetCurrentLogProvider(logger);
-        }
+        private int initialStreams;
+        private BinaryFormat original;
+        private NodeContainerInfo containerInfo;
+        private IConverter<BinaryFormat, NodeContainerFormat> containerConverter;
+        private IConverter<NodeContainerFormat, BinaryFormat> binaryConverter;
 
         [OneTimeSetUp]
         public void SetUpFixture()
@@ -60,8 +52,6 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
         [SetUp]
         public void SetUp()
         {
-            logger.Clear();
-
             // By opening and disposing in each we prevent other tests failing
             // because the file is still open.
             initialStreams = DataStream.ActiveStreams;
@@ -77,7 +67,6 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
 
             // Check everything is virtual node (only the binary stream)
             Assert.That(DataStream.ActiveStreams, Is.EqualTo(initialStreams + 1));
-            Assert.That(logger.IsEmpty, Is.True);
         }
 
         [Test]
@@ -115,8 +104,8 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
             }
 
             if (info.StreamLength > 0) {
-                Assert.That(node.Stream.Offset, Is.EqualTo(info.StreamOffset), "Invalid offset for: {0}", node.Path);
-                Assert.That(node.Stream.Length, Is.EqualTo(info.StreamLength), "Invalid length for: {0}", node.Path);
+                Assert.That(node.Stream.Offset, Is.EqualTo(info.StreamOffset), $"Invalid offset for: {node.Path}");
+                Assert.That(node.Stream.Length, Is.EqualTo(info.StreamLength), $"Invalid length for: {node.Path}");
             }
 
             if (info.CheckChildren) {

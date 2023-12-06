@@ -191,12 +191,13 @@ namespace SceneGate.Lemon.Containers.Converters
 
         private void WriteSHA256(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
         {
+            if (file is null) {
+                writer.Write(new byte[0x20]);
+                return;
+            }
+
             using var sha256 = SHA256.Create();
             try {
-                if (file == null) {
-                    writer.Write(new byte[0x20]);
-                    return;
-                }
 
                 if (hasHashRegion && hashRegion == 0) {
                     writer.Write(sha256.ComputeHash(Array.Empty<byte>()));

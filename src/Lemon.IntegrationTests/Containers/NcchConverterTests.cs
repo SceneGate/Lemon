@@ -23,34 +23,27 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
     using NUnit.Framework;
     using SceneGate.Lemon.Containers.Converters;
     using SceneGate.Lemon.Containers.Formats;
-    using SceneGate.Lemon.Logging;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
-    using Yarhl.FileFormat;
-    using Yarhl.FileSystem;
     using Yarhl.IO;
 
     [TestFixtureSource(typeof(TestData), nameof(TestData.NcchParams))]
     public class NcchConverterTests
     {
-        readonly CaptureLogger logger;
-        readonly string yamlPath;
-        readonly string binaryPath;
-        readonly int offset;
-        readonly int size;
+        private readonly string yamlPath;
+        private readonly string binaryPath;
+        private readonly int offset;
+        private readonly int size;
 
-        int initialStreams;
-        BinaryFormat original;
-        IConverter<BinaryFormat, Ncch> containerConverter;
-        IConverter<Ncch, BinaryFormat> binaryConverter;
+        private int initialStreams;
+        private BinaryFormat original;
+        private Binary2Ncch containerConverter;
+        private Ncch2Binary binaryConverter;
 
-        NcchTestInfo expected;
+        private NcchTestInfo expected;
 
         public NcchConverterTests(string yamlPath, string binaryPath, int offset, int size)
         {
-            logger = new CaptureLogger();
-            LogProvider.SetCurrentLogProvider(logger);
-
             this.yamlPath = yamlPath;
             this.binaryPath = binaryPath;
             this.offset = offset;
@@ -85,8 +78,6 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
         [SetUp]
         public void SetUp()
         {
-            logger.Clear();
-
             // By opening and disposing in each we prevent other tests failing
             // because the file is still open.
             initialStreams = DataStream.ActiveStreams;
@@ -138,7 +129,7 @@ namespace SceneGate.Lemon.IntegrationTests.Containers
                     Assert.That(child.Stream.Offset, Is.EqualTo(offset + expected.RegionsOffset[i]));
                 }
 
-                Assert.That(child.Stream.Length, Is.EqualTo(expected.RegionsSize[i]), "Invalid region {0} size", i);
+                Assert.That(child.Stream.Length, Is.EqualTo(expected.RegionsSize[i]), $"Invalid region {i} size");
             }
         }
     }
