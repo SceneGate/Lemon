@@ -10,3 +10,4 @@ build/temp/
 .vs/
 *.csproj.user
 *.DotSettings.user
+launchSettings.json

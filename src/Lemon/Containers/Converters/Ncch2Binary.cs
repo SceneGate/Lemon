@@ -36,9 +36,7 @@ namespace SceneGate.Lemon.Containers.Converters
     /// </summary>
     /// <remarks>
     /// <p>This converter expects to have a node with the following binary
-    /// children: header_data/partition_id, header_data/maker_code
-    /// header_data/version, header_data/program_id, header_data/product_code,
-    /// header_data/flag_(0 through 7),
+    /// children:
     /// extended_header (optional), access_descriptor (optional), sdk_info.txt (optional),
     /// logo.bin (optional), system (optional), rom (optional).</p>
     /// </remarks>
@@ -147,10 +145,10 @@ namespace SceneGate.Lemon.Containers.Converters
             return binary;
         }
 
-        private void WriteFile(DataWriter writer, Node file, bool isRequired = true)
+        private static void WriteFile(DataWriter writer, Node file, bool isRequired = true)
         {
             if (file == null && isRequired) {
-                throw new System.IO.FileNotFoundException("Missing NCCH file");
+                throw new FileNotFoundException("Missing NCCH file");
             } else if (file == null) {
                 return;
             }
@@ -162,7 +160,11 @@ namespace SceneGate.Lemon.Containers.Converters
             file.Stream.WriteTo(writer.Stream);
         }
 
-        private void WriteOffsetSizeAndData(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
+        private static void WriteOffsetSizeAndData(
+            DataWriter writer,
+            Node file,
+            int hashRegion = 0,
+            bool hasHashRegion = false)
         {
             if (file != null) {
                 long position = writer.Stream.Position;
@@ -189,7 +191,11 @@ namespace SceneGate.Lemon.Containers.Converters
             }
         }
 
-        private void WriteSHA256(DataWriter writer, Node file, int hashRegion = 0, bool hasHashRegion = false)
+        private static void WriteSHA256(
+            DataWriter writer,
+            Node file,
+            int hashRegion = 0,
+            bool hasHashRegion = false)
         {
             if (file is null) {
                 writer.Write(new byte[0x20]);
@@ -205,7 +211,10 @@ namespace SceneGate.Lemon.Containers.Converters
                     int hashSize = hashRegion * 0x200;
                     byte[] buffer = new byte[hashSize];
                     file.Stream.Position = 0;
-                    file.Stream.Read(buffer, 0, hashSize);
+                    int read = file.Stream.Read(buffer, 0, hashSize);
+                    if (read != hashSize) {
+                        throw new EndOfStreamException();
+                    }
 
                     writer.Write(sha256.ComputeHash(buffer));
                 } else {

@@ -126,7 +126,7 @@ namespace SceneGate.Lemon.Containers.Converters.Ivfc
                     info.Directories++;
                     info.DirNamesLength += NameEncoding.GetByteCount(node.Name).Pad(0x04);
                 } else if (node.Stream == null) {
-                    logger.LogError("Node '{path}' is not a folder or a binary file.", node.Path);
+                    logger.LogError("Node '{Path}' is not a folder or a binary file.", node.Path);
                 } else {
                     info.Files++;
                     info.FileNamesLength += NameEncoding.GetByteCount(node.Name).Pad(0x04);
