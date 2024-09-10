@@ -106,7 +106,7 @@ namespace SceneGate.Lemon.Containers.Converters
             return binary;
         }
 
-        private void WriteHeader(DataWriter writer, Node root)
+        private static void WriteHeader(DataWriter writer, Node root)
         {
             writer.Write(HeaderSize);
             writer.Write(CiaType);
@@ -120,7 +120,7 @@ namespace SceneGate.Lemon.Containers.Converters
             writer.WritePadding(0x00, BlockSize);
         }
 
-        private void WriteFile(DataWriter writer, Node file, bool isRequired = true)
+        private static void WriteFile(DataWriter writer, Node file, bool isRequired = true)
         {
             if (file == null && isRequired) {
                 throw new FileNotFoundException("Missing CIA file");
@@ -138,7 +138,7 @@ namespace SceneGate.Lemon.Containers.Converters
             writer.WritePadding(0x00, BlockSize);
         }
 
-        private void UpdateTitleMetadata(TitleMetadata title, Node content)
+        private static void UpdateTitleMetadata(TitleMetadata title, Node content)
         {
             // Update size and HASH title chunks (CIA content children)
             // The hashes of the records and TMD will be updated when writing.
@@ -175,7 +175,7 @@ namespace SceneGate.Lemon.Containers.Converters
             }
         }
 
-        private void WriteContent(DataWriter writer, Node content, TitleMetadata title)
+        private static void WriteContent(DataWriter writer, Node content, TitleMetadata title)
         {
             int contentBitset = 0;
             long contentSize = 0;

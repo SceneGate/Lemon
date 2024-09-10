@@ -84,7 +84,7 @@ namespace SceneGate.Lemon.Containers.Converters
 
             uint version = reader.ReadUInt32();
             if (version != SupportedVersion) {
-                logger.LogWarning("Unsupported version: {actual}, expecting {supported}.", version, SupportedVersion);
+                logger.LogWarning("Unsupported version: {Actual}, expecting {Supported}.", version, SupportedVersion);
             }
 
             // Level 0, 1 and 2 only contain SHA-256 hashes. We can skip

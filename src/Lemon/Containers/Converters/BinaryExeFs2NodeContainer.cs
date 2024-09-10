@@ -88,7 +88,7 @@ namespace SceneGate.Lemon.Containers.Converters
                 byte[] actual = ComputeHash(container.Root.Children[i].Stream);
 
                 if (!expected.SequenceEqual(actual)) {
-                    logger.LogWarning("Wrong hash for child {name}", container.Root.Children[i].Name);
+                    logger.LogWarning("Wrong hash for child {Name}", container.Root.Children[i].Name);
                 }
             }
 
@@ -168,15 +168,15 @@ namespace SceneGate.Lemon.Containers.Converters
                 // Read the file in blocks of 64 KB (small enough for the SOH).
                 stream.Position = 0;
                 int offset = 0;
+                int read;
                 byte[] buffer = new byte[1024 * 64];
                 while (offset + buffer.Length < stream.Length) {
-                    stream.Read(buffer, 0, buffer.Length);
-                    offset += sha.TransformBlock(buffer, 0, buffer.Length, buffer, 0);
+                    read = stream.Read(buffer, 0, buffer.Length);
+                    offset += sha.TransformBlock(buffer, 0, read, buffer, 0);
                 }
 
-                int finalSize = (int)(stream.Length - offset);
-                stream.Read(buffer, 0, finalSize);
-                sha.TransformFinalBlock(buffer, 0, finalSize);
+                read = stream.Read(buffer);
+                sha.TransformFinalBlock(buffer, 0, read);
 
                 hash = sha.Hash;
             }
