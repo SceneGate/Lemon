@@ -36,9 +36,7 @@ namespace SceneGate.Lemon.Containers.Converters
     /// </summary>
     /// <remarks>
     /// <p>This converter expects to have a node with the following binary
-    /// children: header_data/partition_id, header_data/maker_code
-    /// header_data/version, header_data/program_id, header_data/product_code,
-    /// header_data/flag_(0 through 7),
+    /// children:
     /// extended_header (optional), access_descriptor (optional), sdk_info.txt (optional),
     /// logo.bin (optional), system (optional), rom (optional).</p>
     /// </remarks>
